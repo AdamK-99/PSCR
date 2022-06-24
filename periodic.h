@@ -3,5 +3,5 @@
 
 int init_periodic();
 //void *tPeriodicThread(void *cookie);
-
+//extern int counter;
 #endif 

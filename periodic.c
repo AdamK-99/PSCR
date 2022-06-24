@@ -9,7 +9,9 @@
 #include "periodic.h"
 
 void *tPeriodicThread(void *);
-
+void plant();
+void control();
+//int counter;
 int init_periodic()
 {
     int status;
@@ -56,7 +58,29 @@ void *tPeriodicThread(void *cookie)
     param.sched_priority = sched_get_priority_max(policy);
     pthread_setschedparam(pthread_self(), policy, &param);
 
-    printf("Hello from thread!\n");
-    fflush(stdout);
+    static int counter;
+
+    //first task
+    plant();
+
+    counter++;
+
+    if(!(counter%4)) //co 4
+    {
+        control();
+        counter = 0;
+    }
     return 0;
+}
+
+void plant()
+{
+    printf("I'm a plant\n");
+    fflush(stdout);
+}
+
+void control()
+{
+    printf("I'm control\n");
+    fflush(stdout);
 }
