@@ -1,0 +1,4 @@
+cmake_minimum_required(VERSION 3.16)
+project(PSCR VERSION 1.0.0)
+add_executable(pscr water_power_plant.c periodic.c)
+target_link_libraries(pscr pthread rt)

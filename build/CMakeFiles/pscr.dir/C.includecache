@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/student/Desktop/studia/pscr/periodic.c
+stdio.h
+-
+stdlib.h
+-
+time.h
+-
+errno.h
+-
+pthread.h
+-
+signal.h
+-
+mqueue.h
+-
+periodic.h
+/home/student/Desktop/studia/pscr/periodic.h
+
+/home/student/Desktop/studia/pscr/periodic.h
+
