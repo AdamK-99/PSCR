@@ -20,6 +20,7 @@ double PI(double, double*);
 void alpha_controller(int, int*, int*);
 int lock_controller(int, int);
 int lock(int, int);
+double my_noise();
 
 void plant_step()
 {
@@ -76,10 +77,14 @@ void calculate_control()
     prev_val_of_lock1 = alpha_lock1;
     prev_val_of_lock2 = alpha_lock2;
 
+    //dodanie szumu
+    double noise = 0; //docelowo my_noise();, ale to po testach
+
     //wyliczenie przeplywu przez tame
-    double output = -(alpha_lock1+alpha_lock2)/30;
+    double output = -(alpha_lock1+alpha_lock2)/30 + noise;
     pthread_mutex_lock(&input_plant_mutex);
-    plant_input =  river_flowrate+output;
+    //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
+    plant_input = river_flowrate+output;
     pthread_mutex_unlock(&input_plant_mutex);
 }
 
@@ -174,4 +179,9 @@ int lock(int u, int integral)
         return 90;
     } 
     return open_degree;
+}
+
+double my_noise()
+{
+    return (rand() % (100 + 1 - 0) + 0)/1000; //losowa liczba z przedzialu 0-0.1
 }
