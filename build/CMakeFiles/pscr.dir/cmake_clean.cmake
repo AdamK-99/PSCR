@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/pscr.dir/calculations.c.o"
   "CMakeFiles/pscr.dir/periodic.c.o"
   "CMakeFiles/pscr.dir/water_power_plant.c.o"
   "pscr"

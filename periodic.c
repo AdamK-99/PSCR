@@ -1,20 +1,26 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <errno.h>
 #include <pthread.h>
 #include <signal.h>
+#include <time.h>
+#include <errno.h>
 #include <mqueue.h>
+#include <unistd.h>
 
 #include "periodic.h"
+#include "calculations.h"
 
 void *tPeriodicThread(void *);
-void plant();
-void control();
-//int counter;
+void *plant(void *);
+void *control(void *);
+
+sig_atomic_t overrun = 0, overrun1 = 0, overrun2 = 0;
+int counter = 1;
+sig_atomic_t flaga = 0, flaga2=0; //usunac potem
+
 int init_periodic()
 {
-    int status;
+    int status, ret;
 
     pthread_attr_t periodicThreadttr;
     struct itimerspec timerSpecStruct;
@@ -23,7 +29,7 @@ int init_periodic()
 
     //Initialize threads
     pthread_attr_init(&periodicThreadttr);
-    pthread_attr_setschedpolicy(&periodicThreadttr, SCHED_FIFO);
+    ret = pthread_attr_setschedpolicy(&periodicThreadttr, SCHED_FIFO);
 
     //Initialize event
     timerEvent.sigev_notify = SIGEV_THREAD;
@@ -31,7 +37,7 @@ int init_periodic()
     timerEvent.sigev_notify_attributes = &periodicThreadttr;
 
     //Create timer 
-    if(status = timer_create(CLOCK_REALTIME, &timerEvent, &timerVar))
+    if((status = timer_create(CLOCK_REALTIME, &timerEvent, &timerVar)))
     {
         fprintf(stderr, "Creating timer failed: %d\n", status);
         return 0;
@@ -51,6 +57,16 @@ int init_periodic()
 
 void *tPeriodicThread(void *cookie)
 {
+    //potem usunac
+    if(overrun)
+    {
+        printf("Overrun\n");
+        fflush(stdout);
+    }
+    overrun = 1;
+    //------------
+    pthread_t faster, slower;
+    pthread_attr_t afaster, aslower;
     int policy;
     struct sched_param param;
 
@@ -58,29 +74,85 @@ void *tPeriodicThread(void *cookie)
     param.sched_priority = sched_get_priority_max(policy);
     pthread_setschedparam(pthread_self(), policy, &param);
 
-    static int counter;
+    //static int counter = 0;
 
     //first task
-    plant();
+    pthread_attr_init(&afaster);
+    pthread_attr_setschedpolicy(&afaster, SCHED_FIFO);
+    
+    pthread_create(&faster, &afaster, plant, NULL);
+    pthread_detach(faster);
 
-    counter++;
+    
 
     if(!(counter%4)) //co 4
     {
-        control();
+        //second task;
+        pthread_attr_init(&aslower);
+        pthread_attr_setschedpolicy(&aslower, SCHED_FIFO);
+        pthread_create(&slower, &aslower, control, NULL);
+        pthread_detach(slower);
         counter = 0;
     }
+    counter++;
+    //potem usunac
+    overrun = 0;
+    //----------
     return 0;
 }
 
-void plant()
+void *plant(void *cookie)
 {
-    printf("I'm a plant\n");
+    //potem usunac
+    if(overrun1)
+    {
+        printf("Overrun1\n");
+        fflush(stdout);
+    }
+    overrun1 = 1;
+    flaga++;
+    //----------
+    int policy;
+    struct sched_param param;
+
+    pthread_getschedparam(pthread_self(), &policy, &param);
+    param.sched_priority = sched_get_priority_max(policy)-1;
+    pthread_setschedparam(pthread_self(), policy, &param);
+
+    static int counter;
+    plant_step();
+    pthread_mutex_lock(&output_plant_mutex);
+    printf("Poziom %f, krok %d\n", plant_output, counter++);
+    pthread_mutex_unlock(&output_plant_mutex);
     fflush(stdout);
+    //potem usunac
+    flaga2 ++;
+    overrun1 = 0;
+    //---------
 }
 
-void control()
+void *control(void *cookie)
 {
-    printf("I'm control\n");
+    //potem usunac
+    if(overrun2)
+    {
+        printf("Overrun2\n");
+        fflush(stdout);
+    }
+    overrun2 = 2;
+    //------------
+    int policy;
+    struct sched_param param;
+
+    pthread_getschedparam(pthread_self(), &policy, &param);
+    param.sched_priority = sched_get_priority_max(policy)-2;
+    pthread_setschedparam(pthread_self(), policy, &param);
+
+    printf("I'm control, flag %d, flag2 %d\n", flaga, flaga2);
     fflush(stdout);
+    //potem usunac
+    flaga = 0;
+    flaga2 = 0;
+    overrun2 = 0;
+    //----------
 }

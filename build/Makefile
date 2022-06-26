@@ -123,6 +123,33 @@ pscr/fast:
 	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/build
 .PHONY : pscr/fast
 
+calculations.o: calculations.c.o
+
+.PHONY : calculations.o
+
+# target to build an object file
+calculations.c.o:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/calculations.c.o
+.PHONY : calculations.c.o
+
+calculations.i: calculations.c.i
+
+.PHONY : calculations.i
+
+# target to preprocess a source file
+calculations.c.i:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/calculations.c.i
+.PHONY : calculations.c.i
+
+calculations.s: calculations.c.s
+
+.PHONY : calculations.s
+
+# target to generate assembly for a file
+calculations.c.s:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/calculations.c.s
+.PHONY : calculations.c.s
+
 periodic.o: periodic.c.o
 
 .PHONY : periodic.o
@@ -186,6 +213,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... pscr"
+	@echo "... calculations.o"
+	@echo "... calculations.i"
+	@echo "... calculations.s"
 	@echo "... periodic.o"
 	@echo "... periodic.i"
 	@echo "... periodic.s"

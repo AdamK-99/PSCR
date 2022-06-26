@@ -8,5 +8,10 @@
   "directory": "/home/student/Desktop/studia/pscr/build",
   "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/periodic.c.o   -c /home/student/Desktop/studia/pscr/periodic.c",
   "file": "/home/student/Desktop/studia/pscr/periodic.c"
+},
+{
+  "directory": "/home/student/Desktop/studia/pscr/build",
+  "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/calculations.c.o   -c /home/student/Desktop/studia/pscr/calculations.c",
+  "file": "/home/student/Desktop/studia/pscr/calculations.c"
 }
 ]
