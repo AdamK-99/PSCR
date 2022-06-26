@@ -8,17 +8,18 @@ _plant_params plant_params = {9000.0, 0.5, 6.0};
 _reg_params reg_params = {300.0, 0.5, 2.0, -180};
 _lock_controller_params lock_controller_params = {2.0, 1.0, 0.5};
 
-double plant_input = 4, plant_output;
-double control_with_flow;
+double plant_input, plant_output;
+double river_flowrate = 4; //docelowo uzytkownik ma miec mozliwosc zmiany natezenia przeplywu rzeki
 double plant_H = 5.7; //decelowo uzytkownik na poczatku ma to wprowadzic
 const double H_set = 5.2;
 
 pthread_mutex_t input_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t output_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-int PI(double, double*);
+double PI(double, double*);
 void alpha_controller(int, int*, int*);
 int lock_controller(int, int);
+int lock(int, int);
 
 void plant_step()
 {
@@ -39,41 +40,62 @@ void plant_step()
 
 void calculate_control()
 {
-    double e, PI_control;
-    double alpha1, alpha2;
-    double e_alpha1, e_alpha2;
-    double lock1_control, lock2_control;
-    static double integrator_value, prev_lock1, prev_lock2;
-    static double prev_u_lock1, prev_u_lock2;
+    double e;
     pthread_mutex_lock(&output_plant_mutex);
     e = H_set - plant_output;
     pthread_mutex_unlock(&output_plant_mutex);
+
     //sterowanie z regulatora PI
+    double PI_control;
+    static double integrator_value;
     PI_control = -PI(e, &integrator_value);
+
     //rozdzielacz katow
+    int alpha1, alpha2;
     alpha_controller(PI_control, &alpha1, &alpha2);
+
     //sterownik kierownic
-    e_alpha1 = alpha1 - prev_lock1;
-    e_alpha2 = alpha2 - prev_lock2;
+    double e_alpha1, e_alpha2;
+    static int prev_val_of_lock1, prev_val_of_lock2;
+    static double prev_u_lock1, prev_u_lock2;
+    e_alpha1 = alpha1 - prev_val_of_lock1;
+    e_alpha2 = alpha2 - prev_val_of_lock2;
+
+    double lock1_control, lock2_control;
     lock1_control = lock_controller(e_alpha1, prev_u_lock1);
     lock2_control = lock_controller(e_alpha2, prev_u_lock2);
+    
     prev_u_lock1 = lock1_control;
     prev_u_lock2 = lock2_control;
-    //
+    
+    //kierownice
+    double alpha_lock1, alpha_lock2;
+    alpha_lock1 = lock(prev_u_lock1, prev_val_of_lock1);
+    alpha_lock2 = lock(prev_u_lock2, prev_val_of_lock2);
+
+    prev_val_of_lock1 = alpha_lock1;
+    prev_val_of_lock2 = alpha_lock2;
+
+    //wyliczenie przeplywu przez tame
+    double output = -(alpha_lock1+alpha_lock2)/30;
+    pthread_mutex_lock(&input_plant_mutex);
+    plant_input =  river_flowrate+output;
+    pthread_mutex_unlock(&input_plant_mutex);
 }
 
-int PI(double e, double *integrator)
+double PI(double e, double *integrator)
 {
      double control;
      control = e*reg_params.P + (e*reg_params.Ts_reg+(*integrator))*reg_params.I;
      if (control < reg_params.limit)
      {
-        return reg_params.limit;
+        control = reg_params.limit;
      }
      else if (control > 0)
      {
-        return 0;
+        control = 0;
      }
+     *integrator += e*reg_params.Ts_reg;
      return control;
 }
 
@@ -142,4 +164,14 @@ int lock_controller(int e, int prev_lock)
         }
     }
     return u;
+}
+
+int lock(int u, int integral)
+{
+    double open_degree = u*reg_params.Ts_reg*2+integral;
+    if(open_degree > 90)
+    {
+        return 90;
+    } 
+    return open_degree;
 }

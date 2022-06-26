@@ -18,37 +18,3 @@ calculations.h
 
 /home/student/Desktop/studia/pscr/calculations.h
 
-/home/student/Desktop/studia/pscr/periodic.c
-stdio.h
--
-stdlib.h
--
-pthread.h
--
-signal.h
--
-time.h
--
-errno.h
--
-mqueue.h
--
-unistd.h
--
-periodic.h
-/home/student/Desktop/studia/pscr/periodic.h
-calculations.h
-/home/student/Desktop/studia/pscr/calculations.h
-
-/home/student/Desktop/studia/pscr/periodic.h
-
-/home/student/Desktop/studia/pscr/water_power_plant.c
-stdio.h
--
-stdlib.h
--
-periodic.h
-/home/student/Desktop/studia/pscr/periodic.h
-calculations.h
-/home/student/Desktop/studia/pscr/calculations.h
-

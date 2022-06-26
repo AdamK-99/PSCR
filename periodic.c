@@ -15,7 +15,7 @@ void *plant(void *);
 void *control(void *);
 
 sig_atomic_t overrun = 0, overrun1 = 0, overrun2 = 0;
-int counter = 1;
+int counter = 4;
 sig_atomic_t flaga = 0, flaga2=0; //usunac potem
 
 int init_periodic()
@@ -47,6 +47,7 @@ int init_periodic()
 	timerSpecStruct.it_value.tv_sec = 1;
 	timerSpecStruct.it_value.tv_nsec = 0;
 	timerSpecStruct.it_interval.tv_sec = 0;
+    //timerSpecStruct.it_interval.tv_nsec = 0;
 	timerSpecStruct.it_interval.tv_nsec = 500000000;
 
     //Run timer
@@ -119,13 +120,14 @@ void *plant(void *cookie)
     param.sched_priority = sched_get_priority_max(policy)-1;
     pthread_setschedparam(pthread_self(), policy, &param);
 
-    static int counter;
+    static double counter2;
     plant_step();
     pthread_mutex_lock(&output_plant_mutex);
-    printf("Poziom %f, krok %d\n", plant_output, counter++);
+    printf("Poziom %f, krok %f\n", plant_output, counter2);
     pthread_mutex_unlock(&output_plant_mutex);
     fflush(stdout);
     //potem usunac
+    counter2+=0.5;
     flaga2 ++;
     overrun1 = 0;
     //---------
@@ -148,7 +150,12 @@ void *control(void *cookie)
     param.sched_priority = sched_get_priority_max(policy)-2;
     pthread_setschedparam(pthread_self(), policy, &param);
 
+    calculate_control();
+
     printf("I'm control, flag %d, flag2 %d\n", flaga, flaga2);
+    pthread_mutex_lock(&input_plant_mutex);
+    printf("Sterowanie %f\n", plant_input);
+    pthread_mutex_unlock(&input_plant_mutex);
     fflush(stdout);
     //potem usunac
     flaga = 0;
