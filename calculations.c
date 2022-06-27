@@ -12,23 +12,30 @@ double plant_input, plant_output;
 double river_flowrate = 4; //docelowo uzytkownik ma miec mozliwosc zmiany natezenia przeplywu rzeki
 double plant_H = 5.7; //decelowo uzytkownik na poczatku ma to wprowadzic
 const double H_set = 5.2;
+int lock1_control, lock2_control;
+double lock1_angle, lock2_angle;
 
 pthread_mutex_t input_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t output_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t lock1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t locks_angles = PTHREAD_MUTEX_INITIALIZER;
+//pthread_mutex_t lock1_u = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t locks_u = PTHREAD_MUTEX_INITIALIZER;
 
 double PI(double, double*);
 void alpha_controller(int, int*, int*);
 int lock_controller(int, int);
 int lock(int, int);
 double my_noise();
+void calculate_input();
 
 void plant_step()
 {
-    double flowrate, H_new;
-    pthread_mutex_lock(&input_plant_mutex);
-    flowrate = plant_input;
-    pthread_mutex_unlock(&input_plant_mutex);
-    H_new = flowrate * (1/plant_params.Ti) * plant_params.Ts_sim + plant_H;
+    double H_new;
+    //pthread_mutex_lock(&input_plant_mutex);
+    calculate_input();
+    //pthread_mutex_unlock(&input_plant_mutex);
+    H_new = plant_input * (1/plant_params.Ti) * plant_params.Ts_sim + plant_H;
     if(H_new > plant_params.Hlimit)
     {
         H_new = plant_params.Hlimit;
@@ -37,6 +44,33 @@ void plant_step()
     pthread_mutex_lock(&output_plant_mutex);
     plant_output = H_new;
     pthread_mutex_unlock(&output_plant_mutex);
+}
+void calculate_input()
+{
+    // double alpha_lock1, alpha_lock2;
+    //pthread_mutex_lock(&lock1);
+    pthread_mutex_lock(&locks_angles);
+    pthread_mutex_lock(&locks_u);
+    //pthread_mutex_lock(&lock2_u);
+    lock1_angle = lock(lock1_control, lock1_angle);
+    lock2_angle = lock(lock2_control, lock2_angle);
+    //pthread_mutex_unlock(&lock1);
+    pthread_mutex_unlock(&locks_angles);
+    pthread_mutex_unlock(&locks_u);
+    //pthread_mutex_unlock(&lock2_u);
+
+    // prev_val_of_lock1 = alpha_lock1;
+    // prev_val_of_lock2 = alpha_lock2;
+
+    //dodanie szumu
+    double noise = 0; //docelowo my_noise();, ale to po testach
+
+    // //wyliczenie przeplywu przez tame
+    double output = -(lock1_angle+lock2_angle)/30 + noise;
+    pthread_mutex_lock(&input_plant_mutex); //musi bycc mute bo uzytkownik moze zmienic rzeke
+    // //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
+    plant_input = river_flowrate+output;
+    pthread_mutex_unlock(&input_plant_mutex);
 }
 
 void calculate_control()
@@ -57,35 +91,49 @@ void calculate_control()
 
     //sterownik kierownic
     double e_alpha1, e_alpha2;
-    static int prev_val_of_lock1, prev_val_of_lock2;
-    static double prev_u_lock1, prev_u_lock2;
-    e_alpha1 = alpha1 - prev_val_of_lock1;
-    e_alpha2 = alpha2 - prev_val_of_lock2;
+    //static int prev_val_of_lock1, prev_val_of_lock2;
+    //int prev_val_of_lock1, prev_val_of_lock2;
+    //static int lock1_control, lock2_control;
+    //int lock1_control, lock2_control;
+    //mutexy do prev_val_...
+    pthread_mutex_lock(&locks_angles);
+    //pthread_mutex_lock(&lock2);
+    //e_alpha1 = alpha1 - prev_val_of_lock1;
+    e_alpha1 = alpha1 - lock1_angle;
+    e_alpha2 = alpha2 - lock2_angle;
+    //pthread_mutex_unlock(&lock1);
+    pthread_mutex_unlock(&locks_angles);
 
-    double lock1_control, lock2_control;
-    lock1_control = lock_controller(e_alpha1, prev_u_lock1);
-    lock2_control = lock_controller(e_alpha2, prev_u_lock2);
-    
-    prev_u_lock1 = lock1_control;
-    prev_u_lock2 = lock2_control;
+    //double lock1_control, lock2_control;
+    //rw_locki (mutexy?) do lock1_control (lock1_u)
+
+    //pthread_mutex_lock(&lock1_u);
+    pthread_mutex_lock(&locks_u);
+    lock1_control = lock_controller(e_alpha1, lock1_control);
+    lock2_control = lock_controller(e_alpha2, lock2_control);
+    //pthread_mutex_unlock(&lock1_u);
+    pthread_mutex_unlock(&locks_u);
+
+    //prev_u_lock1 = lock1_control;
+    //prev_u_lock2 = lock2_control; to do wywalenia calkiem
     
     //kierownice
-    double alpha_lock1, alpha_lock2;
-    alpha_lock1 = lock(prev_u_lock1, prev_val_of_lock1);
-    alpha_lock2 = lock(prev_u_lock2, prev_val_of_lock2);
+    // double alpha_lock1, alpha_lock2;
+    // alpha_lock1 = lock(lock1_control, prev_val_of_lock1);
+    // alpha_lock2 = lock(lock2_control, prev_val_of_lock2);
 
-    prev_val_of_lock1 = alpha_lock1;
-    prev_val_of_lock2 = alpha_lock2;
+    // prev_val_of_lock1 = alpha_lock1;
+    // prev_val_of_lock2 = alpha_lock2;
 
     //dodanie szumu
-    double noise = 0; //docelowo my_noise();, ale to po testach
+    // double noise = 0; //docelowo my_noise();, ale to po testach
 
-    //wyliczenie przeplywu przez tame
-    double output = -(alpha_lock1+alpha_lock2)/30 + noise;
-    pthread_mutex_lock(&input_plant_mutex);
-    //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
-    plant_input = river_flowrate+output;
-    pthread_mutex_unlock(&input_plant_mutex);
+    // //wyliczenie przeplywu przez tame
+    // double output = -(alpha_lock1+alpha_lock2)/30 + noise;
+    // pthread_mutex_lock(&input_plant_mutex);
+    // //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
+    // plant_input = river_flowrate+output;
+    // pthread_mutex_unlock(&input_plant_mutex);
 }
 
 double PI(double e, double *integrator)
@@ -173,7 +221,7 @@ int lock_controller(int e, int prev_lock)
 
 int lock(int u, int integral)
 {
-    double open_degree = u*reg_params.Ts_reg*2+integral;
+    double open_degree = u*plant_params.Ts_sim*2+integral;
     if(open_degree > 90)
     {
         return 90;
@@ -183,5 +231,5 @@ int lock(int u, int integral)
 
 double my_noise()
 {
-    return (rand() % (100 + 1 - 0) + 0)/1000; //losowa liczba z przedzialu 0-0.1
+    return (rand() % (100 + 1 - 0) + 0)/5000; //losowa liczba z przedzialu 0-0.02
 }

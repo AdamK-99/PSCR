@@ -34,8 +34,14 @@ extern double plant_input, plant_output;
 extern double control_with_flow;
 extern double plant_H;
 extern const double H_set;
+extern int lock1_control, lock2_control;
+extern double lock1_angle, lock2_angle;
 extern pthread_mutex_t input_plant_mutex;
 extern pthread_mutex_t output_plant_mutex;
+//extern pthread_mutex_t locks;
+extern pthread_mutex_t lock2; 
+extern pthread_mutex_t locks_u;
+//extern pthread_mutex_t lock2_u;
 
 void plant_step();
 void calculate_control();

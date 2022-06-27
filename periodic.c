@@ -15,7 +15,7 @@ void *plant(void *);
 void *control(void *);
 
 sig_atomic_t overrun = 0, overrun1 = 0, overrun2 = 0;
-int counter = 4;
+int counter = 3;
 sig_atomic_t flaga = 0, flaga2=0; //usunac potem
 
 int init_periodic()
