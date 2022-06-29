@@ -150,6 +150,33 @@ calculations.c.s:
 	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/calculations.c.s
 .PHONY : calculations.c.s
 
+logger.o: logger.c.o
+
+.PHONY : logger.o
+
+# target to build an object file
+logger.c.o:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/logger.c.o
+.PHONY : logger.c.o
+
+logger.i: logger.c.i
+
+.PHONY : logger.i
+
+# target to preprocess a source file
+logger.c.i:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/logger.c.i
+.PHONY : logger.c.i
+
+logger.s: logger.c.s
+
+.PHONY : logger.s
+
+# target to generate assembly for a file
+logger.c.s:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/logger.c.s
+.PHONY : logger.c.s
+
 periodic.o: periodic.c.o
 
 .PHONY : periodic.o
@@ -216,6 +243,9 @@ help:
 	@echo "... calculations.o"
 	@echo "... calculations.i"
 	@echo "... calculations.s"
+	@echo "... logger.o"
+	@echo "... logger.i"
+	@echo "... logger.s"
 	@echo "... periodic.o"
 	@echo "... periodic.i"
 	@echo "... periodic.s"

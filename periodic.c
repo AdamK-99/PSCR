@@ -9,6 +9,7 @@
 
 #include "periodic.h"
 #include "calculations.h"
+#include "logger.h"
 
 void *tPeriodicThread(void *);
 void *plant(void *);
@@ -77,6 +78,19 @@ void *tPeriodicThread(void *cookie)
 
     //static int counter = 0;
 
+    pthread_mutex_lock(&locks_angles);
+    mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);
+    mq_send(loggerLock2MQueue, (const char *)&lock2_angle, sizeof(double), 0);
+    pthread_mutex_unlock(&locks_angles);
+    pthread_mutex_lock(&input_plant_mutex);
+    mq_send(loggerInputMQueue, (const char *)&plant_input, sizeof(double), 0);
+    pthread_mutex_unlock(&input_plant_mutex);
+    pthread_mutex_lock(&output_plant_mutex);
+    mq_send(loggerOutputMQueue, (const char *)&plant_output, sizeof(double), 0);
+    pthread_mutex_unlock(&output_plant_mutex);
+    
+
+    calculate_input();
     //first task
     pthread_attr_init(&afaster);
     pthread_attr_setschedpolicy(&afaster, SCHED_FIFO);
@@ -84,7 +98,6 @@ void *tPeriodicThread(void *cookie)
     pthread_create(&faster, &afaster, plant, NULL);
     pthread_detach(faster);
 
-    
 
     if(!(counter%4)) //co 4
     {
@@ -96,6 +109,7 @@ void *tPeriodicThread(void *cookie)
         counter = 0;
     }
     counter++;
+    
     //potem usunac
     overrun = 0;
     //----------

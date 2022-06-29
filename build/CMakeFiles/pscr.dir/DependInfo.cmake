@@ -5,6 +5,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
   "/home/student/Desktop/studia/pscr/calculations.c" "/home/student/Desktop/studia/pscr/build/CMakeFiles/pscr.dir/calculations.c.o"
+  "/home/student/Desktop/studia/pscr/logger.c" "/home/student/Desktop/studia/pscr/build/CMakeFiles/pscr.dir/logger.c.o"
   "/home/student/Desktop/studia/pscr/periodic.c" "/home/student/Desktop/studia/pscr/build/CMakeFiles/pscr.dir/periodic.c.o"
   "/home/student/Desktop/studia/pscr/water_power_plant.c" "/home/student/Desktop/studia/pscr/build/CMakeFiles/pscr.dir/water_power_plant.c.o"
   )

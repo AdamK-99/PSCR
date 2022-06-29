@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-
+#include <unistd.h>
 #include "calculations.h"
 
 _plant_params plant_params = {9000.0, 0.5, 6.0};
@@ -10,7 +10,7 @@ _lock_controller_params lock_controller_params = {2.0, 1.0, 0.5};
 
 double plant_input, plant_output;
 double river_flowrate = 4; //docelowo uzytkownik ma miec mozliwosc zmiany natezenia przeplywu rzeki
-double plant_H = 5.7; //decelowo uzytkownik na poczatku ma to wprowadzic
+double plant_H = 5.15; //decelowo uzytkownik na poczatku ma to wprowadzic
 const double H_set = 5.2;
 int lock1_control, lock2_control;
 double lock1_angle, lock2_angle;
@@ -27,13 +27,13 @@ void alpha_controller(int, int*, int*);
 int lock_controller(int, int);
 int lock(int, int);
 double my_noise();
-void calculate_input();
+//void calculate_input();
 
 void plant_step()
 {
     double H_new;
     //pthread_mutex_lock(&input_plant_mutex);
-    calculate_input();
+    //calculate_input();
     //pthread_mutex_unlock(&input_plant_mutex);
     H_new = plant_input * (1/plant_params.Ti) * plant_params.Ts_sim + plant_H;
     if(H_new > plant_params.Hlimit)
