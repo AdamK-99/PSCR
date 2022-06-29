@@ -15,10 +15,10 @@ mqd_t loggerInputMQueue;
 mqd_t loggerLock1MQueue;
 mqd_t loggerLock2MQueue;
 
-struct mq_attr loggerOutputMQueueAttr;
-struct mq_attr loggerInputMQueueAttr;
-struct mq_attr loggerLock1MQueueAttr;
-struct mq_attr loggerLock2MQueueAttr;
+//struct mq_attr loggerOutputMQueueAttr;
+//struct mq_attr loggerInputMQueueAttr;
+//struct mq_attr loggerLock1MQueueAttr;
+struct mq_attr loggerMQueueAttr;
 
 void init_logger()
 {
@@ -28,29 +28,29 @@ void init_logger()
     pthread_attr_init(&loggerThreadAttr);
     pthread_attr_setschedpolicy(&loggerThreadAttr, SCHED_FIFO);
 
-    loggerOutputMQueueAttr.mq_maxmsg = 10;
-    loggerInputMQueueAttr.mq_maxmsg = 10;
-    loggerLock1MQueueAttr.mq_maxmsg = 10;
-    loggerLock2MQueueAttr.mq_maxmsg = 10;
+    // loggerOutputMQueueAttr.mq_maxmsg = 10;
+    // loggerInputMQueueAttr.mq_maxmsg = 10;
+    // loggerLock1MQueueAttr.mq_maxmsg = 10;
+    loggerMQueueAttr.mq_maxmsg = 10;
 
-    loggerOutputMQueueAttr.mq_msgsize = sizeof(double);
-    loggerInputMQueueAttr.mq_msgsize = sizeof(double);
-    loggerLock1MQueueAttr.mq_msgsize = sizeof(double);
-    loggerLock2MQueueAttr.mq_msgsize = sizeof(double);
+    // loggerOutputMQueueAttr.mq_msgsize = sizeof(double);
+    // loggerInputMQueueAttr.mq_msgsize = sizeof(double);
+    // loggerLock1MQueueAttr.mq_msgsize = sizeof(double);
+    loggerMQueueAttr.mq_msgsize = sizeof(double);
 
-    if((loggerOutputMQueue = mq_open("/outputMQ", O_CREAT | O_RDWR, 0644, &loggerOutputMQueueAttr)) == -1)
+    if((loggerOutputMQueue = mq_open("/outputMQ", O_CREAT | O_RDWR, 0644, &loggerMQueueAttr)) == -1)
     {
         fprintf(stderr, "Cannot create OutputMQueue\n");
     }
-    if((loggerInputMQueue = mq_open("/inputMQ", O_CREAT | O_RDWR, 0644, &loggerInputMQueueAttr)) == -1)
+    if((loggerInputMQueue = mq_open("/inputMQ", O_CREAT | O_RDWR, 0644, &loggerMQueueAttr)) == -1)
     {
         fprintf(stderr, "Cannot create InputMQueue\n");
     }
-    if((loggerLock1MQueue = mq_open("/lock1MQ", O_CREAT | O_RDWR, 0644, &loggerLock1MQueueAttr)) == -1)
+    if((loggerLock1MQueue = mq_open("/lock1MQ", O_CREAT | O_RDWR, 0644, &loggerMQueueAttr)) == -1)
     {
         fprintf(stderr, "Cannot create Lock1MQueue\n");
     }
-    if((loggerLock2MQueue = mq_open("/lock2MQ", O_CREAT | O_RDWR, 0644, &loggerLock2MQueueAttr)) == -1)
+    if((loggerLock2MQueue = mq_open("/lock2MQ", O_CREAT | O_RDWR, 0644, &loggerMQueueAttr)) == -1)
     {
         fprintf(stderr, "Cannot create Lock2MQueue\n");
     }

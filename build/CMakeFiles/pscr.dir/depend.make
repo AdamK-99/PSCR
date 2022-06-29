@@ -4,6 +4,10 @@
 CMakeFiles/pscr.dir/calculations.c.o: ../calculations.c
 CMakeFiles/pscr.dir/calculations.c.o: ../calculations.h
 
+CMakeFiles/pscr.dir/keyboard.c.o: ../calculations.h
+CMakeFiles/pscr.dir/keyboard.c.o: ../keyboard.c
+CMakeFiles/pscr.dir/keyboard.c.o: ../keyboard.h
+
 CMakeFiles/pscr.dir/logger.c.o: ../logger.c
 CMakeFiles/pscr.dir/logger.c.o: ../logger.h
 
@@ -13,6 +17,7 @@ CMakeFiles/pscr.dir/periodic.c.o: ../periodic.c
 CMakeFiles/pscr.dir/periodic.c.o: ../periodic.h
 
 CMakeFiles/pscr.dir/water_power_plant.c.o: ../calculations.h
+CMakeFiles/pscr.dir/water_power_plant.c.o: ../keyboard.h
 CMakeFiles/pscr.dir/water_power_plant.c.o: ../logger.h
 CMakeFiles/pscr.dir/water_power_plant.c.o: ../periodic.h
 CMakeFiles/pscr.dir/water_power_plant.c.o: ../water_power_plant.c

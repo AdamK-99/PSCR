@@ -150,6 +150,33 @@ calculations.c.s:
 	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/calculations.c.s
 .PHONY : calculations.c.s
 
+keyboard.o: keyboard.c.o
+
+.PHONY : keyboard.o
+
+# target to build an object file
+keyboard.c.o:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/keyboard.c.o
+.PHONY : keyboard.c.o
+
+keyboard.i: keyboard.c.i
+
+.PHONY : keyboard.i
+
+# target to preprocess a source file
+keyboard.c.i:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/keyboard.c.i
+.PHONY : keyboard.c.i
+
+keyboard.s: keyboard.c.s
+
+.PHONY : keyboard.s
+
+# target to generate assembly for a file
+keyboard.c.s:
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/keyboard.c.s
+.PHONY : keyboard.c.s
+
 logger.o: logger.c.o
 
 .PHONY : logger.o
@@ -243,6 +270,9 @@ help:
 	@echo "... calculations.o"
 	@echo "... calculations.i"
 	@echo "... calculations.s"
+	@echo "... keyboard.o"
+	@echo "... keyboard.i"
+	@echo "... keyboard.s"
 	@echo "... logger.o"
 	@echo "... logger.i"
 	@echo "... logger.s"
