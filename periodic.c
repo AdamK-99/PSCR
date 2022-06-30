@@ -14,6 +14,9 @@
 void *tPeriodicThread(void *);
 void *plant(void *);
 void *control(void *);
+
+pthread_barrier_t barrier_plant, barrier_control;
+
 int fd;
 double buff[5];
 sig_atomic_t overrun = 0, overrun1 = 0, overrun2 = 0;
@@ -32,6 +35,9 @@ int init_periodic()
     //Initialize threads
     pthread_attr_init(&periodicThreadttr);
     ret = pthread_attr_setschedpolicy(&periodicThreadttr, SCHED_FIFO);
+
+    pthread_barrier_init(&barrier_plant, NULL, 2);
+    pthread_barrier_init(&barrier_control, NULL, 3);
 
     //Initialize event
     timerEvent.sigev_notify = SIGEV_THREAD;
@@ -78,13 +84,39 @@ void *tPeriodicThread(void *cookie)
     pthread_setschedparam(pthread_self(), policy, &param);
 
     static double time_counter;
+    int counter_modulo = counter%4;
     //static int counter = 0;
-    //fifo  
+
+    calculate_input();
+    //first task
+    pthread_attr_init(&afaster);
+    pthread_attr_setschedpolicy(&afaster, SCHED_FIFO);
     
+    pthread_create(&faster, &afaster, plant, (void *)&counter_modulo);
+    pthread_detach(faster);
+
+
+    if(!counter_modulo) //co 4
+    {
+        //second task;
+        pthread_attr_init(&aslower);
+        pthread_attr_setschedpolicy(&aslower, SCHED_FIFO);
+        pthread_create(&slower, &aslower, control, NULL);
+        pthread_detach(slower);
+        counter = 0;
+        pthread_barrier_wait(&barrier_control);
+    }
+    else
+    {
+        pthread_barrier_wait(&barrier_plant);
+    }
+
+    //Wysylanie danych 
     if ((fd = open("my_fifo", O_WRONLY)) == -1) {
             fprintf(stderr, "Cannot open FIFO.\n" ); 
             return 0; 
-        }
+    }
+
     pthread_mutex_lock(&locks_angles);
     mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);
     mq_send(loggerLock2MQueue, (const char *)&lock2_angle, sizeof(double), 0);
@@ -102,25 +134,7 @@ void *tPeriodicThread(void *cookie)
     buff[4] = time_counter;
     write(fd,buff,sizeof(buff));
     close(fd);
-
-    calculate_input();
-    //first task
-    pthread_attr_init(&afaster);
-    pthread_attr_setschedpolicy(&afaster, SCHED_FIFO);
     
-    pthread_create(&faster, &afaster, plant, NULL);
-    pthread_detach(faster);
-
-
-    if(!(counter%4)) //co 4
-    {
-        //second task;
-        pthread_attr_init(&aslower);
-        pthread_attr_setschedpolicy(&aslower, SCHED_FIFO);
-        pthread_create(&slower, &aslower, control, NULL);
-        pthread_detach(slower);
-        counter = 0;
-    }
     counter++;
     time_counter += 0.5;
     for (int i = 0; i<5; i++)
@@ -160,6 +174,19 @@ void *plant(void *cookie)
     //potem usunac
     counter2+=0.5;
     flaga2 ++;
+    //printf("%d\n", *((int*)cookie));
+    //fflush(stdout);
+    if(!(*((int*)cookie)))
+    {
+        pthread_barrier_wait(&barrier_control);
+        //printf("Barrier control\n");
+    }
+    else
+    {
+        pthread_barrier_wait(&barrier_plant);
+        //printf("Barrier plant\n");
+    }
+    //fflush(stdout);
     overrun1 = 0;
     //---------
 }
@@ -191,6 +218,7 @@ void *control(void *cookie)
     //potem usunac
     flaga = 0;
     flaga2 = 0;
+    pthread_barrier_wait(&barrier_control);
     overrun2 = 0;
     //----------
 }
