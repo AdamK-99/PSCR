@@ -1,0 +1,1 @@
+/usr/bin/clang -g   CMakeFiles/udp_server_test.dir/udp_server_test.c.o  -o udp_server_test 

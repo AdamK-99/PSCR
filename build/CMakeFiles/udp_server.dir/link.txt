@@ -1,0 +1,1 @@
+/usr/bin/clang -g   CMakeFiles/udp_server.dir/udp_server.c.o  -o udp_server 

@@ -14,7 +14,8 @@
 void *tPeriodicThread(void *);
 void *plant(void *);
 void *control(void *);
-
+int fd;
+double buff[5];
 sig_atomic_t overrun = 0, overrun1 = 0, overrun2 = 0;
 int counter = 3;
 sig_atomic_t flaga = 0, flaga2=0; //usunac potem
@@ -76,19 +77,31 @@ void *tPeriodicThread(void *cookie)
     param.sched_priority = sched_get_priority_max(policy);
     pthread_setschedparam(pthread_self(), policy, &param);
 
+    static double time_counter;
     //static int counter = 0;
-
+    //fifo  
+    
+    if ((fd = open("my_fifo", O_WRONLY)) == -1) {
+            fprintf(stderr, "Cannot open FIFO.\n" ); 
+            return 0; 
+        }
     pthread_mutex_lock(&locks_angles);
     mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);
     mq_send(loggerLock2MQueue, (const char *)&lock2_angle, sizeof(double), 0);
+    buff[2] = lock1_angle;
+    buff[3] = lock2_angle;
     pthread_mutex_unlock(&locks_angles);
     pthread_mutex_lock(&input_plant_mutex);
     mq_send(loggerInputMQueue, (const char *)&plant_input, sizeof(double), 0);
+    buff[0] = plant_input;
     pthread_mutex_unlock(&input_plant_mutex);
     pthread_mutex_lock(&output_plant_mutex);
     mq_send(loggerOutputMQueue, (const char *)&plant_output, sizeof(double), 0);
+    buff[1] = plant_output;
     pthread_mutex_unlock(&output_plant_mutex);
-    
+    buff[4] = time_counter;
+    write(fd,buff,sizeof(buff));
+    close(fd);
 
     calculate_input();
     //first task
@@ -109,7 +122,11 @@ void *tPeriodicThread(void *cookie)
         counter = 0;
     }
     counter++;
-    
+    time_counter += 0.5;
+    for (int i = 0; i<5; i++)
+    {
+        buff[i] = 0.0;
+    }
     //potem usunac
     overrun = 0;
     //----------

@@ -111,6 +111,32 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named udp_server_test
+
+# Build rule for target.
+udp_server_test: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 udp_server_test
+.PHONY : udp_server_test
+
+# fast build rule for target.
+udp_server_test/fast:
+	$(MAKE) -f CMakeFiles/udp_server_test.dir/build.make CMakeFiles/udp_server_test.dir/build
+.PHONY : udp_server_test/fast
+
+#=============================================================================
+# Target rules for targets named udp_client
+
+# Build rule for target.
+udp_client: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 udp_client
+.PHONY : udp_client
+
+# fast build rule for target.
+udp_client/fast:
+	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/build
+.PHONY : udp_client/fast
+
+#=============================================================================
 # Target rules for targets named pscr
 
 # Build rule for target.
@@ -231,6 +257,60 @@ periodic.c.s:
 	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/periodic.c.s
 .PHONY : periodic.c.s
 
+udp_client.o: udp_client.c.o
+
+.PHONY : udp_client.o
+
+# target to build an object file
+udp_client.c.o:
+	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/udp_client.c.o
+.PHONY : udp_client.c.o
+
+udp_client.i: udp_client.c.i
+
+.PHONY : udp_client.i
+
+# target to preprocess a source file
+udp_client.c.i:
+	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/udp_client.c.i
+.PHONY : udp_client.c.i
+
+udp_client.s: udp_client.c.s
+
+.PHONY : udp_client.s
+
+# target to generate assembly for a file
+udp_client.c.s:
+	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/udp_client.c.s
+.PHONY : udp_client.c.s
+
+udp_server_test.o: udp_server_test.c.o
+
+.PHONY : udp_server_test.o
+
+# target to build an object file
+udp_server_test.c.o:
+	$(MAKE) -f CMakeFiles/udp_server_test.dir/build.make CMakeFiles/udp_server_test.dir/udp_server_test.c.o
+.PHONY : udp_server_test.c.o
+
+udp_server_test.i: udp_server_test.c.i
+
+.PHONY : udp_server_test.i
+
+# target to preprocess a source file
+udp_server_test.c.i:
+	$(MAKE) -f CMakeFiles/udp_server_test.dir/build.make CMakeFiles/udp_server_test.dir/udp_server_test.c.i
+.PHONY : udp_server_test.c.i
+
+udp_server_test.s: udp_server_test.c.s
+
+.PHONY : udp_server_test.s
+
+# target to generate assembly for a file
+udp_server_test.c.s:
+	$(MAKE) -f CMakeFiles/udp_server_test.dir/build.make CMakeFiles/udp_server_test.dir/udp_server_test.c.s
+.PHONY : udp_server_test.c.s
+
 water_power_plant.o: water_power_plant.c.o
 
 .PHONY : water_power_plant.o
@@ -265,6 +345,8 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... rebuild_cache"
+	@echo "... udp_server_test"
+	@echo "... udp_client"
 	@echo "... edit_cache"
 	@echo "... pscr"
 	@echo "... calculations.o"
@@ -279,6 +361,12 @@ help:
 	@echo "... periodic.o"
 	@echo "... periodic.i"
 	@echo "... periodic.s"
+	@echo "... udp_client.o"
+	@echo "... udp_client.i"
+	@echo "... udp_client.s"
+	@echo "... udp_server_test.o"
+	@echo "... udp_server_test.i"
+	@echo "... udp_server_test.s"
 	@echo "... water_power_plant.o"
 	@echo "... water_power_plant.i"
 	@echo "... water_power_plant.s"
