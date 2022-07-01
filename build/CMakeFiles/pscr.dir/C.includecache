@@ -8,22 +8,22 @@
 
 /home/student/Desktop/studia/pscr/calculations.h
 
+/home/student/Desktop/studia/pscr/keyboard.h
+
 /home/student/Desktop/studia/pscr/logger.h
 
-/home/student/Desktop/studia/pscr/periodic.c
+/home/student/Desktop/studia/pscr/periodic.h
+
+/home/student/Desktop/studia/pscr/water_power_plant.c
 stdio.h
 -
 stdlib.h
 -
-pthread.h
--
-signal.h
--
-time.h
--
-errno.h
--
 mqueue.h
+-
+sys/types.h
+-
+sys/wait.h
 -
 unistd.h
 -
@@ -33,6 +33,6 @@ calculations.h
 /home/student/Desktop/studia/pscr/calculations.h
 logger.h
 /home/student/Desktop/studia/pscr/logger.h
-
-/home/student/Desktop/studia/pscr/periodic.h
+keyboard.h
+/home/student/Desktop/studia/pscr/keyboard.h
 
