@@ -4,7 +4,6 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "/home/student/Desktop/studia/pscr/logger.c" "/home/student/Desktop/studia/pscr/build/CMakeFiles/udp_client.dir/logger.c.o"
   "/home/student/Desktop/studia/pscr/udp_client.c" "/home/student/Desktop/studia/pscr/build/CMakeFiles/udp_client.dir/udp_client.c.o"
   )
 set(CMAKE_C_COMPILER_ID "Clang")

@@ -1,1 +1,1 @@
-/usr/bin/clang -g   CMakeFiles/pscr.dir/water_power_plant.c.o CMakeFiles/pscr.dir/periodic.c.o CMakeFiles/pscr.dir/calculations.c.o CMakeFiles/pscr.dir/keyboard.c.o  -o pscr  -lpthread -lrt 
+/usr/bin/clang -g   CMakeFiles/pscr.dir/water_power_plant.c.o CMakeFiles/pscr.dir/periodic.c.o CMakeFiles/pscr.dir/calculations.c.o CMakeFiles/pscr.dir/keyboard.c.o CMakeFiles/pscr.dir/logger.c.o  -o pscr  -lpthread -lrt 

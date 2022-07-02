@@ -6,8 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/home/student/Desktop/studia/pscr/logger.h
-
 /home/student/Desktop/studia/pscr/udp_client.c
 stdio.h
 -
@@ -35,6 +33,6 @@ arpa/inet.h
 -
 mqueue.h
 -
-logger.h
-/home/student/Desktop/studia/pscr/logger.h
+signal.h
+-
 

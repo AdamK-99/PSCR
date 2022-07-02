@@ -4,10 +4,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "periodic.h"
 #include "calculations.h"
-// #include "logger.h"
+#include "logger.h"
 #include "keyboard.h"
 
 int main(int argc, char *argv[])
@@ -22,13 +23,12 @@ int main(int argc, char *argv[])
     }
     //printf("Parent program, pid = %d\n", getpid());
 
-
     char c;
 
     //inicjalizacje
     set_initial_level();
     init_keyboard();
-    // init_logger();
+    init_logger();
     init_periodic();
     
     while((c = getc(stdin)))
@@ -36,7 +36,9 @@ int main(int argc, char *argv[])
         if(c == 'q')
         {
             // finalize_loggers();
-            
+            kill(pid, SIGRTMIN);
+            finalize_keyboard();
+            finalize_loggers();
             break;
         }
         else if (c == '\n')
@@ -50,6 +52,8 @@ int main(int argc, char *argv[])
         }
     }
     //printf("koniec");
-
+    waitpid(pid, NULL, 0);
+    printf("Closing everything\n");
+    fflush(stdout);
     return EXIT_SUCCESS;
 }

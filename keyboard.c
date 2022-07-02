@@ -197,3 +197,8 @@ void *userChangesThreadFunc(void *cookie)
         }
     }
 }
+
+void finalize_keyboard()
+{
+    mq_close(keyboardMQueue);
+}

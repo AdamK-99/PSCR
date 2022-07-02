@@ -1,1 +1,1 @@
-/usr/bin/clang -g   CMakeFiles/udp_client.dir/udp_client.c.o CMakeFiles/udp_client.dir/logger.c.o  -o udp_client  -lpthread -lrt 
+/usr/bin/clang -g   CMakeFiles/udp_client.dir/udp_client.c.o  -o udp_client  -lpthread -lrt 

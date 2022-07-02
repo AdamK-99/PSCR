@@ -76,12 +76,12 @@ clean: CMakeFiles/pscr.dir/clean
 CMakeFiles/udp_client.dir/all:
 	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/depend
 	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/student/Desktop/studia/pscr/build/CMakeFiles --progress-num=6,7,8 "Built target udp_client"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/student/Desktop/studia/pscr/build/CMakeFiles --progress-num=7,8 "Built target udp_client"
 .PHONY : CMakeFiles/udp_client.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/udp_client.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Desktop/studia/pscr/build/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Desktop/studia/pscr/build/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/udp_client.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Desktop/studia/pscr/build/CMakeFiles 0
 .PHONY : CMakeFiles/udp_client.dir/rule
@@ -103,12 +103,12 @@ CMakeFiles/udp_client.dir/clean:
 CMakeFiles/pscr.dir/all:
 	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/depend
 	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/student/Desktop/studia/pscr/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target pscr"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/student/Desktop/studia/pscr/build/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target pscr"
 .PHONY : CMakeFiles/pscr.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/pscr.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Desktop/studia/pscr/build/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Desktop/studia/pscr/build/CMakeFiles 6
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/pscr.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/student/Desktop/studia/pscr/build/CMakeFiles 0
 .PHONY : CMakeFiles/pscr.dir/rule

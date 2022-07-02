@@ -40,14 +40,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "pscr::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-pscr-Debug-ea654c6888c5a9dc9597.json",
+					"jsonFile" : "target-pscr-Debug-b0c81d9524eaaece6739.json",
 					"name" : "pscr",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "udp_client::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-udp_client-Debug-cef69469777979932bd1.json",
+					"jsonFile" : "target-udp_client-Debug-097d03302aef64576c08.json",
 					"name" : "udp_client",
 					"projectIndex" : 0
 				}

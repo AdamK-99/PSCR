@@ -6,11 +6,6 @@
 },
 {
   "directory": "/home/student/Desktop/studia/pscr/build",
-  "command": "/usr/bin/clang   -g   -o CMakeFiles/udp_client.dir/logger.c.o   -c /home/student/Desktop/studia/pscr/logger.c",
-  "file": "/home/student/Desktop/studia/pscr/logger.c"
-},
-{
-  "directory": "/home/student/Desktop/studia/pscr/build",
   "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/water_power_plant.c.o   -c /home/student/Desktop/studia/pscr/water_power_plant.c",
   "file": "/home/student/Desktop/studia/pscr/water_power_plant.c"
 },
@@ -28,5 +23,10 @@
   "directory": "/home/student/Desktop/studia/pscr/build",
   "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/keyboard.c.o   -c /home/student/Desktop/studia/pscr/keyboard.c",
   "file": "/home/student/Desktop/studia/pscr/keyboard.c"
+},
+{
+  "directory": "/home/student/Desktop/studia/pscr/build",
+  "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/logger.c.o   -c /home/student/Desktop/studia/pscr/logger.c",
+  "file": "/home/student/Desktop/studia/pscr/logger.c"
 }
 ]

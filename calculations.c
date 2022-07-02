@@ -19,9 +19,7 @@ int lock1_set = 60, lock2_set = 60;
 
 pthread_mutex_t input_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t output_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
-//pthread_mutex_t lock1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t locks_angles = PTHREAD_MUTEX_INITIALIZER;
-//pthread_mutex_t lock1_u = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t locks_u = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mode_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t locks_set = PTHREAD_MUTEX_INITIALIZER;
@@ -31,15 +29,14 @@ void alpha_controller(int, int*, int*);
 int lock_controller(int, int);
 int lock(int, int);
 double my_noise();
-//void calculate_input();
 
 void plant_step()
 {
-    double H_new;
-    //pthread_mutex_lock(&input_plant_mutex);
-    //calculate_input();
-    //pthread_mutex_unlock(&input_plant_mutex);
-    H_new = plant_input * (1/plant_params.Ti) * plant_params.Ts_sim + plant_H;
+    double H_new, plant_input_local;
+    pthread_mutex_lock(&input_plant_mutex);
+    plant_input_local = plant_input;
+    pthread_mutex_unlock(&input_plant_mutex);
+    H_new = plant_input_local * (1/plant_params.Ti) * plant_params.Ts_sim + plant_H;
     if(H_new > plant_params.Hlimit)
     {
         H_new = plant_params.Hlimit;
@@ -51,42 +48,16 @@ void plant_step()
 }
 void calculate_input()
 {
-    // double alpha_lock1, alpha_lock2;
-    //pthread_mutex_lock(&lock1);
     pthread_mutex_lock(&locks_angles);
     pthread_mutex_lock(&locks_u);
-    //pthread_mutex_lock(&lock2_u);
     lock1_angle = lock(lock1_control, lock1_angle);
     lock2_angle = lock(lock2_control, lock2_angle);
-    //pthread_mutex_unlock(&lock1);
     pthread_mutex_unlock(&locks_angles);
     pthread_mutex_unlock(&locks_u);
-    //pthread_mutex_unlock(&lock2_u);
-
-    // prev_val_of_lock1 = alpha_lock1;
-    // prev_val_of_lock2 = alpha_lock2;
 
     //dodanie szumu
     double noise = 0; //docelowo my_noise();, ale to po testach
     
-    // //wyliczenie przeplywu przez tame
-    // double current_lvl;
-    // pthread_mutex_lock(&output_plant_mutex);
-    // current_lvl = plant_output;
-    // pthread_mutex_unlock(&output_plant_mutex);
-    // double lvl_difference;
-    // if(current_lvl<H_set)
-    // {
-    //     lvl_difference = 0;
-    // }
-    // else if (current_lvl > plant_params.locksHeight + H_set)
-    // {
-    //     lvl_difference = plant_params.locksHeight;
-    // }
-    // else
-    // {
-    //     lvl_difference = current_lvl - H_set;
-    // }
     double lock1_angle_local, lock2_angle_local;
     pthread_mutex_lock(&locks_angles);
     lock1_angle_local = lock1_angle;
@@ -94,7 +65,6 @@ void calculate_input()
     pthread_mutex_unlock(&locks_angles);
     double output = -(lock1_angle_local+lock2_angle_local)/180*600+ noise;
     pthread_mutex_lock(&input_plant_mutex); //musi bycc mute bo uzytkownik moze zmienic rzeke
-    // //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
     plant_input = river_flowrate+output;
     pthread_mutex_unlock(&input_plant_mutex);
 }
@@ -133,28 +103,6 @@ void calculate_control()
     lock1_control = lock_controller(e_alpha1, lock1_control);
     lock2_control = lock_controller(e_alpha2, lock2_control);
     pthread_mutex_unlock(&locks_u);
-
-    //prev_u_lock1 = lock1_control;
-    //prev_u_lock2 = lock2_control; to do wywalenia calkiem
-    
-    //kierownice
-    // double alpha_lock1, alpha_lock2;
-    // alpha_lock1 = lock(lock1_control, prev_val_of_lock1);
-    // alpha_lock2 = lock(lock2_control, prev_val_of_lock2);
-
-    // prev_val_of_lock1 = alpha_lock1;
-    // prev_val_of_lock2 = alpha_lock2;
-
-    //dodanie szumu
-    // double noise = 0; //docelowo my_noise();, ale to po testach
-
-    // //wyliczenie przeplywu przez tame
-    // double output = -(alpha_lock1+alpha_lock2)/30 + noise;
-    // pthread_mutex_lock(&input_plant_mutex);
-    // //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
-    // plant_input = river_flowrate+output;
-    // pthread_mutex_unlock(&input_plant_mutex);
-
 }
 
 double PI(double e, double *integrator)

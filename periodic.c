@@ -9,7 +9,7 @@
 
 #include "periodic.h"
 #include "calculations.h"
-// #include "logger.h"
+#include "logger.h"
 
 void *tPeriodicThread(void *);
 void *plant(void *);
@@ -118,17 +118,17 @@ void *tPeriodicThread(void *cookie)
     }
 
     pthread_mutex_lock(&locks_angles);
-    // mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);
-    // mq_send(loggerLock2MQueue, (const char *)&lock2_angle, sizeof(double), 0);
+    mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);
+    mq_send(loggerLock2MQueue, (const char *)&lock2_angle, sizeof(double), 0);
     buff[2] = lock1_angle;
     buff[3] = lock2_angle;
     pthread_mutex_unlock(&locks_angles);
     pthread_mutex_lock(&input_plant_mutex);
-    // mq_send(loggerInputMQueue, (const char *)&plant_input, sizeof(double), 0);
+    mq_send(loggerInputMQueue, (const char *)&plant_input, sizeof(double), 0);
     buff[0] = plant_input;
     pthread_mutex_unlock(&input_plant_mutex);
     pthread_mutex_lock(&output_plant_mutex);
-    // mq_send(loggerOutputMQueue, (const char *)&plant_output, sizeof(double), 0);
+    mq_send(loggerOutputMQueue, (const char *)&plant_output, sizeof(double), 0);
     buff[1] = plant_output;
     pthread_mutex_unlock(&output_plant_mutex);
     buff[4] = time_counter;

@@ -196,7 +196,7 @@ logger.o: logger.c.o
 
 # target to build an object file
 logger.c.o:
-	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/logger.c.o
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/logger.c.o
 .PHONY : logger.c.o
 
 logger.i: logger.c.i
@@ -205,7 +205,7 @@ logger.i: logger.c.i
 
 # target to preprocess a source file
 logger.c.i:
-	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/logger.c.i
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/logger.c.i
 .PHONY : logger.c.i
 
 logger.s: logger.c.s
@@ -214,7 +214,7 @@ logger.s: logger.c.s
 
 # target to generate assembly for a file
 logger.c.s:
-	$(MAKE) -f CMakeFiles/udp_client.dir/build.make CMakeFiles/udp_client.dir/logger.c.s
+	$(MAKE) -f CMakeFiles/pscr.dir/build.make CMakeFiles/pscr.dir/logger.c.s
 .PHONY : logger.c.s
 
 periodic.o: periodic.c.o
