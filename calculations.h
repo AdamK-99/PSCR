@@ -6,7 +6,6 @@ struct _plant_params
     double Ti;
     double Ts_sim;
     double Hlimit;
-    double locksHeight;
 };
 typedef struct _plant_params _plant_params;
 

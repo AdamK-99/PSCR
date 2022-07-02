@@ -4,12 +4,12 @@
 #include <unistd.h>
 #include "calculations.h"
 
-_plant_params plant_params = {9000.0, 0.5, 6.0, 0.2};
+_plant_params plant_params = {900000.0, 0.5, 6.0};
 _reg_params reg_params = {300.0, 0.5, 2.0, -180};
 _lock_controller_params lock_controller_params = {2.0, 1.0, 0.5};
 
 double plant_input, plant_output;
-double river_flowrate = 4; //docelowo uzytkownik ma miec mozliwosc zmiany natezenia przeplywu rzeki
+double river_flowrate = 400; //docelowo uzytkownik ma miec mozliwosc zmiany natezenia przeplywu rzeki
 double plant_H; //decelowo uzytkownik na poczatku ma to wprowadzic
 int mode; //0 - auto, 1 - close
 const double H_set = 5.2;
@@ -70,29 +70,29 @@ void calculate_input()
     double noise = 0; //docelowo my_noise();, ale to po testach
     
     // //wyliczenie przeplywu przez tame
-    double current_lvl;
-    pthread_mutex_lock(&output_plant_mutex);
-    current_lvl = plant_output;
-    pthread_mutex_unlock(&output_plant_mutex);
-    double lvl_difference;
-    if(current_lvl<H_set)
-    {
-        lvl_difference = 0;
-    }
-    else if (current_lvl > plant_params.locksHeight + H_set)
-    {
-        lvl_difference = plant_params.locksHeight;
-    }
-    else
-    {
-        lvl_difference = current_lvl - H_set;
-    }
+    // double current_lvl;
+    // pthread_mutex_lock(&output_plant_mutex);
+    // current_lvl = plant_output;
+    // pthread_mutex_unlock(&output_plant_mutex);
+    // double lvl_difference;
+    // if(current_lvl<H_set)
+    // {
+    //     lvl_difference = 0;
+    // }
+    // else if (current_lvl > plant_params.locksHeight + H_set)
+    // {
+    //     lvl_difference = plant_params.locksHeight;
+    // }
+    // else
+    // {
+    //     lvl_difference = current_lvl - H_set;
+    // }
     double lock1_angle_local, lock2_angle_local;
     pthread_mutex_lock(&locks_angles);
     lock1_angle_local = lock1_angle;
     lock2_angle_local = lock2_angle;
     pthread_mutex_unlock(&locks_angles);
-    double output = -((lock1_angle_local/90*3*lvl_difference/plant_params.locksHeight) + (lock2_angle_local/90*3*lvl_difference/plant_params.locksHeight))+ noise;
+    double output = -(lock1_angle_local+lock2_angle_local)/180*600+ noise;
     pthread_mutex_lock(&input_plant_mutex); //musi bycc mute bo uzytkownik moze zmienic rzeke
     // //DODAC MUTEXA OD RIVER_FLOWRATE JAK ZROBIE ZMIANE PRZEPLYWU Z KLAWIATURY !!!!!!!!
     plant_input = river_flowrate+output;
@@ -292,5 +292,5 @@ int lock(int u, int integral)
 
 double my_noise()
 {
-    return (rand() % (100 + 1 - 0) + 0)/5000; //losowa liczba z przedzialu 0-0.02
+    return (rand() % (100 + 1 - 0) + 0)/20; //losowa liczba z przedzialu 0-5
 }

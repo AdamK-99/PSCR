@@ -78,13 +78,13 @@ void *userChangesThreadFunc(void *cookie)
         if (c == '+')
         {
             pthread_mutex_lock(&input_plant_mutex);
-            river_flowrate += 0.05;
+            river_flowrate += 5;
             pthread_mutex_unlock(&input_plant_mutex);
         }
         else if (c == '-')
         {
             pthread_mutex_lock(&input_plant_mutex);
-            river_flowrate -= 0.05;
+            river_flowrate -= 5;
             pthread_mutex_unlock(&input_plant_mutex);
         }
         else if (c == 'a')

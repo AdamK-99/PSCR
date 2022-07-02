@@ -6,29 +6,17 @@
 
 #IncludeRegexTransform: 
 
-/home/student/Desktop/studia/pscr/calculations.h
-
-/home/student/Desktop/studia/pscr/keyboard.h
-
-/home/student/Desktop/studia/pscr/periodic.h
-
-/home/student/Desktop/studia/pscr/water_power_plant.c
+/home/student/Desktop/studia/pscr/calculations.c
 stdio.h
 -
 stdlib.h
 -
-mqueue.h
--
-sys/types.h
--
-sys/wait.h
+pthread.h
 -
 unistd.h
 -
-periodic.h
-/home/student/Desktop/studia/pscr/periodic.h
 calculations.h
 /home/student/Desktop/studia/pscr/calculations.h
-keyboard.h
-/home/student/Desktop/studia/pscr/keyboard.h
+
+/home/student/Desktop/studia/pscr/calculations.h
 
