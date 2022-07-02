@@ -15,8 +15,7 @@
 					"targetIndexes" : 
 					[
 						0,
-						1,
-						2
+						1
 					]
 				}
 			],
@@ -32,8 +31,7 @@
 					"targetIndexes" : 
 					[
 						0,
-						1,
-						2
+						1
 					]
 				}
 			],
@@ -42,22 +40,15 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "pscr::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-pscr-Debug-c91a2c61e3e637266579.json",
+					"jsonFile" : "target-pscr-Debug-ea654c6888c5a9dc9597.json",
 					"name" : "pscr",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "udp_client::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-udp_client-Debug-38bfd13d98a29e7a9f65.json",
+					"jsonFile" : "target-udp_client-Debug-cef69469777979932bd1.json",
 					"name" : "udp_client",
-					"projectIndex" : 0
-				},
-				{
-					"directoryIndex" : 0,
-					"id" : "udp_server_test::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-udp_server_test-Debug-48a5865a95e45ae5ed51.json",
-					"name" : "udp_server_test",
 					"projectIndex" : 0
 				}
 			]

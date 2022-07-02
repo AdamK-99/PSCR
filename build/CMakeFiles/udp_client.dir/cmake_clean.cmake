@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/udp_client.dir/logger.c.o"
   "CMakeFiles/udp_client.dir/udp_client.c.o"
   "udp_client"
   "udp_client.pdb"

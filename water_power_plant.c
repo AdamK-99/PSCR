@@ -7,7 +7,7 @@
 
 #include "periodic.h"
 #include "calculations.h"
-#include "logger.h"
+// #include "logger.h"
 #include "keyboard.h"
 
 int main(int argc, char *argv[])
@@ -28,14 +28,14 @@ int main(int argc, char *argv[])
     //inicjalizacje
     set_initial_level();
     init_keyboard();
-    init_logger();
+    // init_logger();
     init_periodic();
     
     while((c = getc(stdin)))
     {
         if(c == 'q')
         {
-            finalize_loggers();
+            // finalize_loggers();
             
             break;
         }

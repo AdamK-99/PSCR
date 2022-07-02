@@ -10,6 +10,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <mqueue.h>
+
+#include "logger.h"
 
 double buff[5];
 int fd, bytes_read;
@@ -43,6 +46,8 @@ int main(int argc, char *argv[])
     socket_addr.sin_port = htons(1100);
     socket_addr.sin_addr.s_addr = INADDR_ANY;
 
+    init_logger();
+
     while(1)
     {
         memset(buff, 0, sizeof(buff));
@@ -59,6 +64,12 @@ int main(int argc, char *argv[])
         if (bytes_read > 0) {
             printf("Message: input %f, output %f, lock1 %d, lock2 %d, time %f\n", buff[0], buff[1], (int)buff[2], (int)buff[3], buff[4]);
             fflush(stdout);
+            // zapis danych do plikow
+            mq_send(loggerInputMQueue, (const char *)&buff[0], sizeof(double), 0);
+            mq_send(loggerOutputMQueue, (const char *)&buff[1], sizeof(double), 0);
+            mq_send(loggerLock1MQueue, (const char *)&buff[2], sizeof(double), 0);
+            mq_send(loggerLock2MQueue, (const char *)&buff[3], sizeof(double), 0);
+            // wysylka danych do serwera UDP
             sendto(my_socket, buff, sizeof(buff), MSG_CONFIRM, (const struct sockaddr *)&socket_addr, sizeof(socket_addr));
         }
     }

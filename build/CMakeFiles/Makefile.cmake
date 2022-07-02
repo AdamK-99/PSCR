@@ -48,7 +48,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/udp_server_test.dir/DependInfo.cmake"
   "CMakeFiles/udp_client.dir/DependInfo.cmake"
   "CMakeFiles/pscr.dir/DependInfo.cmake"
   )

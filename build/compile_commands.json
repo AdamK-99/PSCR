@@ -1,13 +1,13 @@
 [
 {
   "directory": "/home/student/Desktop/studia/pscr/build",
-  "command": "/usr/bin/clang   -g   -o CMakeFiles/udp_server_test.dir/udp_server_test.c.o   -c /home/student/Desktop/studia/pscr/udp_server_test.c",
-  "file": "/home/student/Desktop/studia/pscr/udp_server_test.c"
+  "command": "/usr/bin/clang   -g   -o CMakeFiles/udp_client.dir/udp_client.c.o   -c /home/student/Desktop/studia/pscr/udp_client.c",
+  "file": "/home/student/Desktop/studia/pscr/udp_client.c"
 },
 {
   "directory": "/home/student/Desktop/studia/pscr/build",
-  "command": "/usr/bin/clang   -g   -o CMakeFiles/udp_client.dir/udp_client.c.o   -c /home/student/Desktop/studia/pscr/udp_client.c",
-  "file": "/home/student/Desktop/studia/pscr/udp_client.c"
+  "command": "/usr/bin/clang   -g   -o CMakeFiles/udp_client.dir/logger.c.o   -c /home/student/Desktop/studia/pscr/logger.c",
+  "file": "/home/student/Desktop/studia/pscr/logger.c"
 },
 {
   "directory": "/home/student/Desktop/studia/pscr/build",
@@ -23,11 +23,6 @@
   "directory": "/home/student/Desktop/studia/pscr/build",
   "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/calculations.c.o   -c /home/student/Desktop/studia/pscr/calculations.c",
   "file": "/home/student/Desktop/studia/pscr/calculations.c"
-},
-{
-  "directory": "/home/student/Desktop/studia/pscr/build",
-  "command": "/usr/bin/clang   -g   -o CMakeFiles/pscr.dir/logger.c.o   -c /home/student/Desktop/studia/pscr/logger.c",
-  "file": "/home/student/Desktop/studia/pscr/logger.c"
 },
 {
   "directory": "/home/student/Desktop/studia/pscr/build",

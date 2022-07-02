@@ -1,5 +1,4 @@
 /home/student/Desktop/studia/pscr/build/CMakeFiles/rebuild_cache.dir
-/home/student/Desktop/studia/pscr/build/CMakeFiles/udp_server_test.dir
 /home/student/Desktop/studia/pscr/build/CMakeFiles/udp_client.dir
 /home/student/Desktop/studia/pscr/build/CMakeFiles/edit_cache.dir
 /home/student/Desktop/studia/pscr/build/CMakeFiles/pscr.dir

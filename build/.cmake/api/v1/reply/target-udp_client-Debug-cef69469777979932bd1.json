@@ -41,7 +41,8 @@
 			"language" : "C",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -57,6 +58,14 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
+			},
+			{
+				"fragment" : "-lpthread",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lrt",
+				"role" : "libraries"
 			}
 		],
 		"language" : "C"
@@ -74,7 +83,8 @@
 			"name" : "Source Files",
 			"sourceIndexes" : 
 			[
-				0
+				0,
+				1
 			]
 		}
 	],
@@ -84,6 +94,12 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "udp_client.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "logger.c",
 			"sourceGroupIndex" : 0
 		}
 	],
