@@ -9,9 +9,9 @@ _reg_params reg_params = {300.0, 0.5, 2.0, -180};
 _lock_controller_params lock_controller_params = {2.0, 1.0, 0.5};
 
 double plant_input, plant_output;
-double river_flowrate = 400; //docelowo uzytkownik ma miec mozliwosc zmiany natezenia przeplywu rzeki
-double plant_H; //decelowo uzytkownik na poczatku ma to wprowadzic
-int mode; //0 - auto, 1 - close
+double river_flowrate = 400;
+double plant_H;
+int mode; //0 - auto, 1 - close, 2 - kierownica 1, 3 - kierownica 2, 4 - obie kierownice
 const double H_set = 5.2;
 int lock1_control, lock2_control;
 double lock1_angle, lock2_angle;
@@ -56,7 +56,7 @@ void calculate_input()
     pthread_mutex_unlock(&locks_u);
 
     //dodanie szumu
-    double noise = 0; //docelowo my_noise();, ale to po testach
+    double noise = my_noise();
     
     double lock1_angle_local, lock2_angle_local;
     pthread_mutex_lock(&locks_angles);
@@ -64,7 +64,7 @@ void calculate_input()
     lock2_angle_local = lock2_angle;
     pthread_mutex_unlock(&locks_angles);
     double output = -(lock1_angle_local+lock2_angle_local)/180*600+ noise;
-    pthread_mutex_lock(&input_plant_mutex); //musi bycc mute bo uzytkownik moze zmienic rzeke
+    pthread_mutex_lock(&input_plant_mutex);
     plant_input = river_flowrate+output;
     pthread_mutex_unlock(&input_plant_mutex);
 }

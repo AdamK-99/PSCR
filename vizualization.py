@@ -23,7 +23,7 @@ plt.ion()
 plt.figure(1) # input
 h1, = plt.plot([],[])
 plt.xlim(0,xlim)
-plt.ylim(-2, 6)
+plt.ylim(-200, 600)
 plt.grid(visible=True)
 plt.suptitle('Calkowite natezenie wody przeplywajacej przez zbiornik')
 plt.xlabel('Czas [s]')

@@ -13,8 +13,6 @@
 #include <mqueue.h>
 #include <signal.h>
 
-// #include "logger.h"
-
 static void close_task();
 
 double buff[5];
@@ -23,9 +21,8 @@ int main(int argc, char *argv[])
 {
     
 
-    int n;//, addr_length;
+    int n;
     struct sockaddr_in socket_addr;
-    //printf("Child process, pid = %d, parent's pid = %d\n", getpid(), getppid());
 
     //Zrobienie FIFO
     if((mkfifo("my_fifo", 0664) == -1) && (errno != EEXIST))
@@ -71,21 +68,9 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Something is wrong with FIFO.\n" ); 
             return 0; 
         }
-
-        // If there is no data just continue
         if (bytes_read == 0)
             continue;
-
-        // If there is message print it
         if (bytes_read > 0) {
-            printf("Message: input %f, output %f, lock1 %d, lock2 %d, time %f\n", buff[0], buff[1], (int)buff[2], (int)buff[3], buff[4]);
-            fflush(stdout);
-            // zapis danych do plikow
-            // mq_send(loggerInputMQueue, (const char *)&buff[0], sizeof(double), 0);
-            // mq_send(loggerOutputMQueue, (const char *)&buff[1], sizeof(double), 0);
-            // mq_send(loggerLock1MQueue, (const char *)&buff[2], sizeof(double), 0);
-            // mq_send(loggerLock2MQueue, (const char *)&buff[3], sizeof(double), 0);
-            // wysylka danych do serwera UDP
             sendto(my_socket, buff, sizeof(buff), MSG_CONFIRM, (const struct sockaddr *)&socket_addr, sizeof(socket_addr));
         }
     }
@@ -94,10 +79,9 @@ int main(int argc, char *argv[])
 
 void close_task()
 {
-    // finalize_loggers();
     close(fd);
     remove("my_fifo");
-    printf("Quitting...\n");
+    printf("Closing UDP client...\n");
     fflush(stdout);
     exit(0);
 }

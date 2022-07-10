@@ -19,24 +19,18 @@ void set_initial_level()
     x = scanf("%lf", &start_value);
     if(x)
     {
-        if(start_value>6.0)
+        if(start_value>6.0) //jezeli podano za duza wartosc 
         {
-            //printf("Too large value, initial level set to 6m\n");
             start_value = 6.0;
         }
-        else if (start_value<0.0)
+        else if (start_value<0.0) // jezeli podano za mala wartosc
         {
-            //printf("Too low value, initial level set to 0m\n");
             start_value = 0.0;
-        }
-        else
-        {
-            //printf("Initial level set, %f\n", start_value);
         }
     }
     else
     {
-        //printf("Incorrect value, set default initial level equal to 5.7m\n");
+        //domyslna wartosc startowa
         start_value = 5.7;
     }
     plant_H = start_value;
@@ -84,22 +78,23 @@ void *userChangesThreadFunc(void *cookie)
         else if (c == '-')
         {
             pthread_mutex_lock(&input_plant_mutex);
-            river_flowrate -= 5;
+            if(river_flowrate >=5)
+            {
+                river_flowrate -= 5;
+            }
             pthread_mutex_unlock(&input_plant_mutex);
         }
-        else if (c == 'a')
+        else if (c == 'a')//przejscie na automatyczne sterowanie kierownicami
         {
             pthread_mutex_lock(&mode_mutex);
             mode = 0;
             pthread_mutex_unlock(&mode_mutex);
-            //przejscie na automatyczne sterowanie kierownicami
         }
-        else if (c == 'c')
+        else if (c == 'c')//zamkniecie kierownic
         {
             pthread_mutex_lock(&mode_mutex);
             mode = 1;
             pthread_mutex_unlock(&mode_mutex);
-            //zamkniecie kierownic
         }
         else if(c == '1') //sterowanie kierownica nr 1
         {
@@ -119,7 +114,7 @@ void *userChangesThreadFunc(void *cookie)
             mode = 4;
             pthread_mutex_unlock(&mode_mutex);
         }
-        else if(c == 'p')
+        else if(c == 'p') //dodanie 5 stopni otwarcia kierownicy
         {
             int mode_local;
             pthread_mutex_lock(&mode_mutex);
@@ -157,7 +152,7 @@ void *userChangesThreadFunc(void *cookie)
                 pthread_mutex_unlock(&locks_set);
             }
         }
-        else if(c == 'm')
+        else if(c == 'm') //odjecie 5 stopni otwarcia kierownicy
         {
             int mode_local;
             pthread_mutex_lock(&mode_mutex);

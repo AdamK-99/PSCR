@@ -19,9 +19,7 @@ pthread_barrier_t barrier_plant, barrier_control;
 
 int fd;
 double buff[5];
-sig_atomic_t overrun = 0, overrun1 = 0, overrun2 = 0;
 int counter = 3;
-sig_atomic_t flaga = 0, flaga2=0; //usunac potem
 
 int init_periodic()
 {
@@ -55,7 +53,6 @@ int init_periodic()
 	timerSpecStruct.it_value.tv_sec = 1;
 	timerSpecStruct.it_value.tv_nsec = 0;
 	timerSpecStruct.it_interval.tv_sec = 0;
-    //timerSpecStruct.it_interval.tv_nsec = 0;
 	timerSpecStruct.it_interval.tv_nsec = 500000000;
 
     //Run timer
@@ -66,14 +63,6 @@ int init_periodic()
 
 void *tPeriodicThread(void *cookie)
 {
-    //potem usunac
-    if(overrun)
-    {
-        printf("Overrun\n");
-        fflush(stdout);
-    }
-    overrun = 1;
-    //------------
     pthread_t faster, slower;
     pthread_attr_t afaster, aslower;
     int policy;
@@ -85,8 +74,8 @@ void *tPeriodicThread(void *cookie)
 
     static double time_counter;
     int counter_modulo = counter%4;
-    //static int counter = 0;
 
+    //wyznaczenie wejscia dla obiektu zbiornika
     calculate_input();
     //first task
     pthread_attr_init(&afaster);
@@ -141,23 +130,11 @@ void *tPeriodicThread(void *cookie)
     {
         buff[i] = 0.0;
     }
-    //potem usunac
-    overrun = 0;
-    //----------
     return 0;
 }
 
 void *plant(void *cookie)
 {
-    //potem usunac
-    if(overrun1)
-    {
-        printf("Overrun1\n");
-        fflush(stdout);
-    }
-    overrun1 = 1;
-    flaga++;
-    //----------
     int policy;
     struct sched_param param;
 
@@ -165,42 +142,20 @@ void *plant(void *cookie)
     param.sched_priority = sched_get_priority_max(policy)-1;
     pthread_setschedparam(pthread_self(), policy, &param);
 
-    static double counter2;
     plant_step();
-    pthread_mutex_lock(&output_plant_mutex);
-    printf("Poziom %f, krok %f\n", plant_output, counter2);
-    pthread_mutex_unlock(&output_plant_mutex);
-    fflush(stdout);
-    //potem usunac
-    counter2+=0.5;
-    flaga2 ++;
-    //printf("%d\n", *((int*)cookie));
-    //fflush(stdout);
+
     if(!(*((int*)cookie)))
     {
         pthread_barrier_wait(&barrier_control);
-        //printf("Barrier control\n");
     }
     else
     {
         pthread_barrier_wait(&barrier_plant);
-        //printf("Barrier plant\n");
     }
-    //fflush(stdout);
-    overrun1 = 0;
-    //---------
 }
 
 void *control(void *cookie)
 {
-    //potem usunac
-    if(overrun2)
-    {
-        printf("Overrun2\n");
-        fflush(stdout);
-    }
-    overrun2 = 2;
-    //------------
     int policy;
     struct sched_param param;
 
@@ -209,16 +164,4 @@ void *control(void *cookie)
     pthread_setschedparam(pthread_self(), policy, &param);
 
     calculate_control();
-
-    printf("I'm control, flag %d, flag2 %d\n", flaga, flaga2);
-    pthread_mutex_lock(&input_plant_mutex);
-    printf("Sterowanie %f\n", plant_input);
-    pthread_mutex_unlock(&input_plant_mutex);
-    fflush(stdout);
-    //potem usunac
-    flaga = 0;
-    flaga2 = 0;
-    pthread_barrier_wait(&barrier_control);
-    overrun2 = 0;
-    //----------
 }

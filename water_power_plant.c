@@ -17,11 +17,10 @@ int main(int argc, char *argv[])
     char * child_arg[3] = {"./udp_client",NULL};
     pid = fork();
 
-    if(pid == 0) //child process
+    if(pid == 0) //child process, klient UDP
     {
         execvp(child_arg[0], child_arg);
     }
-    //printf("Parent program, pid = %d\n", getpid());
 
     char c;
 
@@ -35,7 +34,6 @@ int main(int argc, char *argv[])
     {
         if(c == 'q')
         {
-            // finalize_loggers();
             kill(pid, SIGRTMIN);
             finalize_keyboard();
             finalize_loggers();
@@ -48,12 +46,11 @@ int main(int argc, char *argv[])
         else
         {
             mq_send(keyboardMQueue, (const char *)&c, sizeof(char), 0);
-            //continue; //docelowo wysyanie kolejka mq
         }
     }
-    //printf("koniec");
+
     waitpid(pid, NULL, 0);
-    printf("Closing everything\n");
+    printf("Closing main...\n");
     fflush(stdout);
     return EXIT_SUCCESS;
 }
