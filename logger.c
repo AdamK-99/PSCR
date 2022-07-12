@@ -5,6 +5,8 @@
 
 #include "logger.h"
 
+ //zapis danych do plikow tekstowych
+
 void *loggerOutputThreadFunc(void*);
 void *loggerInputThreadFunc(void*);
 void *loggerLock1ThreadFunc(void*);

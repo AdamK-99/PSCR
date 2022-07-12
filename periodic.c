@@ -75,7 +75,7 @@ void *tPeriodicThread(void *cookie)
     static double time_counter;
     int counter_modulo = counter%4;
 
-    //wyznaczenie wejscia dla obiektu zbiornika
+    //wyznaczenie wejscia dla obiektu zbiornika (przeplyw przez uklad)
     calculate_input();
     //first task
     pthread_attr_init(&afaster);
@@ -93,19 +93,15 @@ void *tPeriodicThread(void *cookie)
         pthread_create(&slower, &aslower, control, NULL);
         pthread_detach(slower);
         counter = 0;
-        pthread_barrier_wait(&barrier_control);
+        pthread_barrier_wait(&barrier_control); //synchronizacja, aby przeslac spojne dane
     }
     else
     {
         pthread_barrier_wait(&barrier_plant);
     }
 
+    
     //Wysylanie danych 
-    if ((fd = open("my_fifo", O_WRONLY)) == -1) {
-            fprintf(stderr, "Cannot open FIFO.\n" ); 
-            return 0; 
-    }
-
     pthread_mutex_lock(&locks_angles);
     mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);
     mq_send(loggerLock2MQueue, (const char *)&lock2_angle, sizeof(double), 0);
@@ -121,6 +117,11 @@ void *tPeriodicThread(void *cookie)
     buff[1] = plant_output;
     pthread_mutex_unlock(&output_plant_mutex);
     buff[4] = time_counter;
+    
+    if ((fd = open("my_fifo", O_WRONLY)) == -1) {
+            fprintf(stderr, "Cannot open FIFO.\n" ); 
+            return 0; 
+    }
     write(fd,buff,sizeof(buff));
     close(fd);
     

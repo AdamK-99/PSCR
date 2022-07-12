@@ -69,13 +69,13 @@ void *userChangesThreadFunc(void *cookie)
     for(;;)
     {
         mq_receive(keyboardMQueue, (char *)&c, sizeof(char), NULL);
-        if (c == '+')
+        if (c == '+') //zwiekszenie przeplywu rzeki o 5l/s
         {
             pthread_mutex_lock(&input_plant_mutex);
             river_flowrate += 5;
             pthread_mutex_unlock(&input_plant_mutex);
         }
-        else if (c == '-')
+        else if (c == '-') //zmniejszenie przeplywu rzeki o 5l/s
         {
             pthread_mutex_lock(&input_plant_mutex);
             if(river_flowrate >=5)

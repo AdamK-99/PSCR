@@ -16,6 +16,8 @@ sock.bind((UDP_IP, UDP_PORT))
 time_step = 0.5 #s
 xlim = 1000 #s
 x = np.linspace(0,time_step, xlim)
+ymin_input = -200
+ymax_input = 600
 
 #inicjalizacja wykresow
 plt.ion()
@@ -23,7 +25,7 @@ plt.ion()
 plt.figure(1) # input
 h1, = plt.plot([],[])
 plt.xlim(0,xlim)
-plt.ylim(-200, 600)
+plt.ylim(ymin_input, ymax_input)
 plt.grid(visible=True)
 plt.suptitle('Calkowite natezenie wody przeplywajacej przez zbiornik')
 plt.xlabel('Czas [s]')
@@ -60,6 +62,12 @@ while True:
     curr_time = h1.get_xdata()[-1]
     if curr_time > xlim:
         plt.xlim(curr_time-xlim, curr_time)
+    if unpacked_msg[0] > ymax_input:
+        plt.ylim(ymin_input, unpacked_msg[0])
+        ymax_input = unpacked_msg[0]
+    elif unpacked_msg[0] < ymin_input:
+        plt.ylim(unpacked_msg[0], ymax_input)
+        ymin_input = unpacked_msg[0]
     plt.figure(1).canvas.draw()
     plt.figure(1).canvas.flush_events()
     plt.draw()

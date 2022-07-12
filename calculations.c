@@ -9,13 +9,13 @@ _reg_params reg_params = {300.0, 0.5, 2.0, -180};
 _lock_controller_params lock_controller_params = {2.0, 1.0, 0.5};
 
 double plant_input, plant_output;
-double river_flowrate = 400;
-double plant_H;
+double river_flowrate = 400; //natezenie przeplywu rzeki
+double plant_H; //poziom wody w zbiorniku
 int mode; //0 - auto, 1 - close, 2 - kierownica 1, 3 - kierownica 2, 4 - obie kierownice
 const double H_set = 5.2;
-int lock1_control, lock2_control;
-double lock1_angle, lock2_angle;
-int lock1_set = 60, lock2_set = 60;
+int lock1_control, lock2_control; //sygnaly sterujace kierowncami (1 - otwieranie, 0 - brak akcji, -1 - zamykanie)
+double lock1_angle, lock2_angle; //aktualne otwarcie kierownic
+int lock1_set = 60, lock2_set = 60; //nastawy kierwnic przy sterowaniu recznym
 
 pthread_mutex_t input_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t output_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -30,7 +30,7 @@ int lock_controller(int, int);
 int lock(int, int);
 double my_noise();
 
-void plant_step()
+void plant_step() //krok symulacji obiektu
 {
     double H_new, plant_input_local;
     pthread_mutex_lock(&input_plant_mutex);
@@ -46,7 +46,7 @@ void plant_step()
     plant_output = H_new;
     pthread_mutex_unlock(&output_plant_mutex);
 }
-void calculate_input()
+void calculate_input() //obliczenie przeplywu wody przez uklad 
 {
     pthread_mutex_lock(&locks_angles);
     pthread_mutex_lock(&locks_u);
@@ -65,11 +65,11 @@ void calculate_input()
     pthread_mutex_unlock(&locks_angles);
     double output = -(lock1_angle_local+lock2_angle_local)/180*600+ noise;
     pthread_mutex_lock(&input_plant_mutex);
-    plant_input = river_flowrate+output;
+    plant_input = river_flowrate+output; //przeplyw rzeki odjac przeplyw przez zapore
     pthread_mutex_unlock(&input_plant_mutex);
 }
 
-void calculate_control()
+void calculate_control() //wyznaczenie sterowania
 {
     double e;
     pthread_mutex_lock(&output_plant_mutex);
@@ -121,7 +121,7 @@ double PI(double e, double *integrator)
      return control;
 }
 
-void alpha_controller(int alpha, int *alpha1, int *alpha2)
+void alpha_controller(int alpha, int *alpha1, int *alpha2) //rozdzielacz katow
 {
     int mode_local;
 
@@ -185,7 +185,7 @@ void alpha_controller(int alpha, int *alpha1, int *alpha2)
     
 }
 
-int lock_controller(int e, int prev_lock)
+int lock_controller(int e, int prev_lock) //sterownik kierownic
 {
     int u;
     if(prev_lock == 1)
@@ -228,13 +228,17 @@ int lock_controller(int e, int prev_lock)
     return u;
 }
 
-int lock(int u, int integral)
+int lock(int u, int integral) //kierownica
 {
     double open_degree = u*plant_params.Ts_sim*2+integral;
     if(open_degree > 90)
     {
         return 90;
     } 
+    else if (open_degree < 0)
+    {
+        return 0;
+    }
     return open_degree;
 }
 
