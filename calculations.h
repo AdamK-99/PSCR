@@ -27,26 +27,41 @@ struct _lock_controller_params
 };
 typedef struct _lock_controller_params _lock_controller_params;
 
+struct _sluice_lock_params
+{
+    double flowrate;
+    double step;
+};
+typedef struct _sluice_lock_params _sluice_lock_params;
+
 extern _plant_params plant_params;
 extern _reg_params reg_params;
 extern _lock_controller_params lock_controller_params;
 extern double plant_input, plant_output;
 extern double river_flowrate;
 extern double plant_H;
-extern const double H_set;
+extern const double H_set, H_set_down;
 extern int lock1_control, lock2_control;
 extern double lock1_angle, lock2_angle;
 extern int mode;
 extern int lock1_set, lock2_set;
+extern int sluice_door_opened;
+extern int sluice_signal_to_close_door;
 extern pthread_mutex_t input_plant_mutex;
 extern pthread_mutex_t output_plant_mutex;
 extern pthread_mutex_t locks_angles; 
 extern pthread_mutex_t locks_u;
 extern pthread_mutex_t mode_mutex;
 extern pthread_mutex_t locks_set;
+extern pthread_mutex_t sluice_lock_mutex;
+extern pthread_mutex_t sluice_step_mutex;
+extern pthread_mutex_t sluice_door_mutex;
+extern pthread_mutex_t sluice_signal_to_close_door_mutex;
 
 void plant_step();
 void calculate_control();
 void calculate_input();
+void sluice_lock();
+void sluice();
 
 #endif

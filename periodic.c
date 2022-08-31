@@ -14,6 +14,7 @@
 void *tPeriodicThread(void *);
 void *plant(void *);
 void *control(void *);
+void *sluice_thread(void *);
 
 pthread_barrier_t barrier_plant, barrier_control;
 
@@ -63,8 +64,8 @@ int init_periodic()
 
 void *tPeriodicThread(void *cookie)
 {
-    pthread_t faster, slower;
-    pthread_attr_t afaster, aslower;
+    pthread_t faster, slower, irregular;
+    pthread_attr_t afaster, aslower, airregular;
     int policy;
     struct sched_param param;
 
@@ -75,6 +76,22 @@ void *tPeriodicThread(void *cookie)
     static double time_counter;
     int counter_modulo = counter%4;
 
+    //sluza
+    // pthread_mutex_lock(&mode_mutex);
+    // if(mode == 5 || mode == 6)
+    // {
+    //     pthread_mutex_unlock(&mode_mutex);
+        pthread_attr_init(&airregular); //sluza chodzi zawsze, w razie anulowania trzeba zamknac otwory
+        pthread_attr_setschedpolicy(&airregular, SCHED_FIFO);
+        
+        pthread_create(&irregular, &airregular, sluice_thread, NULL);
+        pthread_detach(irregular);
+    // }
+    // else
+    // {
+    //     pthread_mutex_unlock(&mode_mutex);
+    // }
+    
     //wyznaczenie wejscia dla obiektu zbiornika (przeplyw przez uklad)
     calculate_input();
     //first task
@@ -165,4 +182,17 @@ void *control(void *cookie)
     pthread_setschedparam(pthread_self(), policy, &param);
 
     calculate_control();
+}
+
+void *sluice_thread(void *cookie)
+{
+    int policy;
+    struct sched_param param;
+
+    pthread_getschedparam(pthread_self(), &policy, &param);
+    param.sched_priority = sched_get_priority_max(policy)-3;
+    pthread_setschedparam(pthread_self(), policy, &param);
+
+    sluice_lock();
+    sluice();
 }
