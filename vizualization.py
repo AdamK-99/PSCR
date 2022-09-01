@@ -50,10 +50,12 @@ plt.suptitle('Otwarcie kierownic')
 plt.xlabel("Czas [s]")
 plt.ylabel("Stopnie")
 
+door_message_written = False
+
 print("Server set, starting to listen")
 while True:
     data, addr = sock.recvfrom(64)
-    unpacked_msg = struct.unpack('ddddd', data)
+    unpacked_msg = struct.unpack('dddddd', data)
 
     # input
     plt.figure(1)
@@ -71,8 +73,6 @@ while True:
     plt.figure(1).canvas.draw()
     plt.figure(1).canvas.flush_events()
     plt.draw()
-
-    print(unpacked_msg[0])
 
     #output
     plt.figure(2)
@@ -95,3 +95,19 @@ while True:
     plt.figure(3).canvas.draw()
     plt.figure(3).canvas.flush_events()
     plt.draw()
+
+    if unpacked_msg[5] == 1 and not door_message_written:
+        minutes = unpacked_msg[4] // 60
+        seconds = unpacked_msg[4] % 60
+        hours = minutes // 60
+        minutes = minutes % 60
+        print((int)hours,":",(int)minutes,":",(int)seconds," - Sluice door opened, waiting for signal to close...")
+        door_message_written = True
+    
+    if door_message_written and unpacked_msg[5] == 0:
+        minutes = unpacked_msg[4] // 60
+        seconds = unpacked_msg[4] % 60
+        hours = minutes // 60
+        minutes = minutes % 60
+        print((int)hours,":",(int)minutes,":",(int)seconds," - Sluice door closed")
+        door_message_written = False

@@ -15,7 +15,7 @@
 
 static void close_task();
 
-double buff[5];
+double buff[6];
 int fd, bytes_read;
 int main(int argc, char *argv[]) 
 {

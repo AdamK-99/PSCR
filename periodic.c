@@ -19,7 +19,7 @@ void *sluice_thread(void *);
 pthread_barrier_t barrier_plant, barrier_control;
 
 int fd;
-double buff[5];
+double buff[6];
 int counter = 3;
 
 int init_periodic()
@@ -123,7 +123,10 @@ void *tPeriodicThread(void *cookie)
     buff[1] = plant_output;
     pthread_mutex_unlock(&output_plant_mutex);
     buff[4] = time_counter;
-    
+    pthread_mutex_lock(&sluice_door_mutex);
+    buff[5] = (double)sluice_door_opened;
+    pthread_mutex_unlock(&sluice_door_mutex);
+
     if ((fd = open("my_fifo", O_WRONLY)) == -1) {
             fprintf(stderr, "Cannot open FIFO.\n" ); 
             return 0; 
@@ -133,7 +136,7 @@ void *tPeriodicThread(void *cookie)
     
     counter++;
     time_counter += 0.5;
-    for (int i = 0; i<5; i++)
+    for (int i = 0; i<6; i++)
     {
         buff[i] = 0.0;
     }
