@@ -54,7 +54,7 @@ extern pthread_mutex_t locks_u;
 extern pthread_mutex_t mode_mutex;
 extern pthread_mutex_t locks_set;
 extern pthread_mutex_t sluice_lock_mutex;
-extern pthread_mutex_t sluice_step_mutex;
+// extern pthread_mutex_t sluice_step_mutex;
 extern pthread_mutex_t sluice_door_mutex;
 extern pthread_mutex_t sluice_signal_to_close_door_mutex;
 

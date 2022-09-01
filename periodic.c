@@ -64,8 +64,8 @@ int init_periodic()
 
 void *tPeriodicThread(void *cookie)
 {
-    pthread_t faster, slower, irregular;
-    pthread_attr_t afaster, aslower, airregular;
+    pthread_t faster, slower, sluice;
+    pthread_attr_t afaster, aslower, asluice;
     int policy;
     struct sched_param param;
 
@@ -76,22 +76,6 @@ void *tPeriodicThread(void *cookie)
     static double time_counter;
     int counter_modulo = counter%4;
 
-    //sluza
-    // pthread_mutex_lock(&mode_mutex);
-    // if(mode == 5 || mode == 6)
-    // {
-    //     pthread_mutex_unlock(&mode_mutex);
-        pthread_attr_init(&airregular); //sluza chodzi zawsze, w razie anulowania trzeba zamknac otwory
-        pthread_attr_setschedpolicy(&airregular, SCHED_FIFO);
-        
-        pthread_create(&irregular, &airregular, sluice_thread, NULL);
-        pthread_detach(irregular);
-    // }
-    // else
-    // {
-    //     pthread_mutex_unlock(&mode_mutex);
-    // }
-    
     //wyznaczenie wejscia dla obiektu zbiornika (przeplyw przez uklad)
     calculate_input();
     //first task
@@ -101,6 +85,12 @@ void *tPeriodicThread(void *cookie)
     pthread_create(&faster, &afaster, plant, (void *)&counter_modulo);
     pthread_detach(faster);
 
+    //sluza
+    pthread_attr_init(&asluice);
+    pthread_attr_setschedpolicy(&asluice, SCHED_FIFO);
+    
+    pthread_create(&sluice, &asluice, sluice_thread, NULL);
+    pthread_detach(sluice);
 
     if(!counter_modulo) //co 4
     {
@@ -117,7 +107,6 @@ void *tPeriodicThread(void *cookie)
         pthread_barrier_wait(&barrier_plant);
     }
 
-    
     //Wysylanie danych 
     pthread_mutex_lock(&locks_angles);
     mq_send(loggerLock1MQueue, (const char *)&lock1_angle, sizeof(double), 0);

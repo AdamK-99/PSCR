@@ -7,7 +7,8 @@
 _plant_params plant_params = {900000.0, 0.5, 6.0};
 _reg_params reg_params = {300.0, 0.5, 2.0, -180};
 _lock_controller_params lock_controller_params = {2.0, 1.0, 0.5};
-_sluice_lock_params sluice_lock_params = {5000.0, 0.05};
+_sluice_lock_params sluice_lock_params = {5000.0, 0.02};
+_sluice_lock_params sluice_tanks_lock_params = {1500.0, 0.02};
 
 double plant_input, plant_output;
 double river_flowrate = 400.0; //natezenie przeplywu rzeki
@@ -19,9 +20,11 @@ int lock1_control, lock2_control; //sygnaly sterujace kierowncami (1 - otwierani
 double lock1_angle, lock2_angle; //aktualne otwarcie kierownic
 int lock1_set = 60, lock2_set = 60; //nastawy kierwnic przy sterowaniu recznym
 double sluice_lock_opened = 0.0;
+double sluice_tanks_lock_opened = 0.0;
 int sluice_step = 0;
 int sluice_door_opened = 0;
 int sluice_signal_to_close_door = 0;
+int were_tanks_used = 0;
 
 pthread_mutex_t input_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t output_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -33,6 +36,7 @@ pthread_mutex_t sluice_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t sluice_step_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t sluice_door_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t sluice_signal_to_close_door_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t sluice_tank_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 double PI(double, double*);
 void alpha_controller(int, int*, int*);
@@ -42,7 +46,7 @@ double my_noise();
 
 void plant_step() //krok symulacji obiektu
 {
-    double H_new, plant_input_local;
+    double H_new, plant_input_local, H_prev;
     pthread_mutex_lock(&input_plant_mutex);
     plant_input_local = plant_input;
     pthread_mutex_unlock(&input_plant_mutex);
@@ -51,6 +55,7 @@ void plant_step() //krok symulacji obiektu
     {
         H_new = plant_params.Hlimit;
     }
+    H_prev = plant_H;
     plant_H = H_new;
     pthread_mutex_lock(&output_plant_mutex);
     pthread_mutex_lock(&sluice_door_mutex);
@@ -61,6 +66,7 @@ void plant_step() //krok symulacji obiektu
     else
     {
         plant_output = H_set_down;
+        plant_H = H_prev;
     }
     pthread_mutex_unlock(&output_plant_mutex);
     pthread_mutex_unlock(&sluice_door_mutex);
@@ -77,12 +83,23 @@ void calculate_input() //obliczenie przeplywu wody przez uklad
     //dodanie szumu
     double noise = my_noise();
     
-    double lock1_angle_local, lock2_angle_local;
+    double lock1_angle_local, lock2_angle_local, sluice_lock_opened_local, sluice_tanks_lock_opened_local;
+
     pthread_mutex_lock(&locks_angles);
     lock1_angle_local = lock1_angle;
     lock2_angle_local = lock2_angle;
     pthread_mutex_unlock(&locks_angles);
-    double output = -(lock1_angle_local+lock2_angle_local)/180*600 + noise - sluice_lock_params.flowrate*sluice_lock_opened;
+
+    pthread_mutex_lock(&sluice_lock_mutex);
+    sluice_lock_opened_local = sluice_lock_opened;
+    pthread_mutex_unlock(&sluice_lock_mutex);
+
+    pthread_mutex_lock(&sluice_tank_lock_mutex);
+    sluice_tanks_lock_opened_local = sluice_tanks_lock_opened;
+    pthread_mutex_unlock(&sluice_tank_lock_mutex);
+
+    double output = -(lock1_angle_local+lock2_angle_local)/180*600 + noise - sluice_lock_params.flowrate*sluice_lock_opened_local + sluice_tanks_lock_opened_local * sluice_tanks_lock_params.flowrate;
+    
     pthread_mutex_lock(&input_plant_mutex);
     plant_input = river_flowrate+output; //przeplyw rzeki odjac przeplyw przez zapore
     pthread_mutex_unlock(&input_plant_mutex);
@@ -142,22 +159,27 @@ double PI(double e, double *integrator)
 
 void alpha_controller(int alpha, int *alpha1, int *alpha2) //rozdzielacz katow
 {
-    int mode_local;
+    int mode_local, sluice_step_local;
 
     pthread_mutex_lock(&mode_mutex);
     mode_local = mode;
     pthread_mutex_unlock(&mode_mutex);
+
+    pthread_mutex_lock(&sluice_step_mutex);
+    sluice_step_local = sluice_step;
+    pthread_mutex_unlock(&sluice_step_mutex);
+    
     if(mode_local == 0)
     {
         if(alpha < 30)
         {
-            *alpha1 = 0;
-            *alpha2 = 0;
+            *alpha1 = -4;
+            *alpha2 = -4;
         }
         else if(alpha>=30 && alpha<=60)
         {
             *alpha1 = alpha;
-            *alpha2 = 0;
+            *alpha2 = -4;
         }
         else if(alpha > 60 && alpha <=120)
         {
@@ -172,8 +194,8 @@ void alpha_controller(int alpha, int *alpha1, int *alpha2) //rozdzielacz katow
     }
     else if (mode_local == 1)
     {
-        *alpha1 = 0;
-        *alpha2 = 0;
+        *alpha1 = -4;
+        *alpha2 = -4;
     }
     else if (mode_local == 2)
     {
@@ -201,7 +223,8 @@ void alpha_controller(int alpha, int *alpha1, int *alpha2) //rozdzielacz katow
         *alpha2 = lock2_set;
         pthread_mutex_unlock(&locks_set);
     }
-    else if ((mode_local == 5 || mode == 6) && sluice_step == 0)
+    // else if ((mode_local == 5 || mode == 6) && sluice_step == 0)
+    else if (mode_local == 5 && sluice_step_local == 0)
     {
         double water_lvl;
         pthread_mutex_lock(&output_plant_mutex);
@@ -209,19 +232,19 @@ void alpha_controller(int alpha, int *alpha1, int *alpha2) //rozdzielacz katow
         pthread_mutex_unlock(&output_plant_mutex);
         if(water_lvl - H_set_down >= H_min_for_power_plant)
         {
-            *alpha1 = 92;
-            *alpha2 = 92;
+            *alpha1 = 94;
+            *alpha2 = 94;
         }
         else
         {
-            *alpha1 = 0;
-            *alpha2 = 0;
+            *alpha1 = -4;
+            *alpha2 = -4;
         }
     }
-    else //mode 6 sprawdzic czy mozna pod to podciagnac mode 1
+    else //sluza; zamykanie przy spuszczaniu wody
     {
-        *alpha1 = 0;
-        *alpha2 = 0;
+        *alpha1 = -4;
+        *alpha2 = -4;
     }
     
 }
@@ -290,16 +313,19 @@ double my_noise()
 
 void sluice_lock()
 {
-    int mode_local;
+    int mode_local, sluice_step_local;
     pthread_mutex_lock(&mode_mutex);
     mode_local = mode;
     pthread_mutex_unlock(&mode_mutex);
 
-    //if mode 5 i 6
-    if ((mode_local == 5 || mode_local == 6) && sluice_step == 0)
+    pthread_mutex_lock(&sluice_step_mutex);
+    sluice_step_local = sluice_step;
+    pthread_mutex_unlock(&sluice_step_mutex);
+
+    if (mode_local == 5 && sluice_step_local == 0)
     {
         pthread_mutex_lock(&sluice_lock_mutex);
-        if(sluice_lock_opened <= 0.95)
+        if(sluice_lock_opened < 1.0 - sluice_lock_params.step + 0.01) //+0.01 bo 0.98 nie dzialalo
         {
             sluice_lock_opened += sluice_lock_params.step;
         }
@@ -308,45 +334,46 @@ void sluice_lock()
     else
     {
         pthread_mutex_lock(&sluice_lock_mutex);
-        if(sluice_lock_opened >= sluice_lock_params.step)
+        if(sluice_lock_opened > sluice_lock_params.step - 0.01)
         {
             sluice_lock_opened -= sluice_lock_params.step;
         }
         pthread_mutex_unlock(&sluice_lock_mutex);
-        // sluice_step = 0;
     }
 }
 
 void sluice()
 {
-    int mode_local, sluice_signal_to_close_door_local;
+    int mode_local, sluice_step_local;
     pthread_mutex_lock(&mode_mutex);
     mode_local = mode;
     pthread_mutex_unlock(&mode_mutex);
 
-    pthread_mutex_lock(&sluice_signal_to_close_door_mutex);
-    sluice_signal_to_close_door_local = sluice_signal_to_close_door;
-    pthread_mutex_unlock(&sluice_signal_to_close_door_mutex);
-
-    double water_lvl;
-    pthread_mutex_lock(&output_plant_mutex);
-    water_lvl = plant_output;
-    pthread_mutex_unlock(&output_plant_mutex);
-
-    static double previous_river_flowrate;
+    pthread_mutex_lock(&sluice_step_mutex);
+    sluice_step_local = sluice_step;
+    pthread_mutex_unlock(&sluice_step_mutex);
 
     if(mode_local == 5)
     {
-        if(water_lvl <= H_set_down && sluice_step == 0)
+        int sluice_signal_to_close_door_local;
+        pthread_mutex_lock(&sluice_signal_to_close_door_mutex);
+        sluice_signal_to_close_door_local = sluice_signal_to_close_door;
+        pthread_mutex_unlock(&sluice_signal_to_close_door_mutex);
+
+        double water_lvl;
+        pthread_mutex_lock(&output_plant_mutex);
+        water_lvl = plant_output;
+        pthread_mutex_unlock(&output_plant_mutex);
+
+        if(water_lvl < H_set_down && sluice_step_local == 0)
         {
             pthread_mutex_lock(&sluice_door_mutex);
             sluice_door_opened = 1;
             pthread_mutex_unlock(&sluice_door_mutex);
-            sluice_step = 1;
 
-            pthread_mutex_lock(&input_plant_mutex);
-            previous_river_flowrate = river_flowrate;
-            pthread_mutex_unlock(&input_plant_mutex);
+            pthread_mutex_lock(&sluice_step_mutex);
+            sluice_step = 1;
+            pthread_mutex_unlock(&sluice_step_mutex);
         }
         else if(sluice_signal_to_close_door_local == 1)
         {
@@ -354,11 +381,14 @@ void sluice()
             sluice_door_opened = 0;
             pthread_mutex_unlock(&sluice_door_mutex);
 
-            pthread_mutex_lock(&input_plant_mutex);
-            river_flowrate = 1500.0 + previous_river_flowrate;
-            pthread_mutex_unlock(&input_plant_mutex);
+            pthread_mutex_lock(&sluice_tank_lock_mutex);
+            if(sluice_tanks_lock_opened < 1.0 - sluice_tanks_lock_params.step + 0.01 && were_tanks_used == 0)
+            {
+                sluice_tanks_lock_opened += sluice_tanks_lock_params.step;
+            }
+            pthread_mutex_unlock(&sluice_tank_lock_mutex);
 
-            if(water_lvl - H_set_down >= 2.5) //ochrona czesci calkujacej aby sie nie napelnila zbednie
+            if(water_lvl - H_set_down > 2.6) //ochrona czesci calkujacej aby sie nie napelnila zbednie
             {
                 pthread_mutex_lock(&mode_mutex);
                 mode = 0;
@@ -367,25 +397,29 @@ void sluice()
                 pthread_mutex_lock(&sluice_signal_to_close_door_mutex);
                 sluice_signal_to_close_door = 0;
                 pthread_mutex_unlock(&sluice_signal_to_close_door_mutex);
-
-                pthread_mutex_lock(&input_plant_mutex);
-                river_flowrate = previous_river_flowrate;
-                pthread_mutex_unlock(&input_plant_mutex);
+                were_tanks_used = 1;
             }
         }
     }
-    else if(mode_local == 6)
-    {
-
-    }
     else
     {
+        pthread_mutex_lock(&sluice_step_mutex);
         sluice_step = 0;
+        pthread_mutex_unlock(&sluice_step_mutex);
+
         pthread_mutex_lock(&sluice_signal_to_close_door_mutex);
         sluice_signal_to_close_door = 0;
         pthread_mutex_unlock(&sluice_signal_to_close_door_mutex);
+
         pthread_mutex_lock(&sluice_door_mutex);
         sluice_door_opened = 0;
         pthread_mutex_unlock(&sluice_door_mutex);
+
+        pthread_mutex_lock(&sluice_tank_lock_mutex);
+        if(sluice_tanks_lock_opened > sluice_tanks_lock_params.step - 0.01)
+        {
+            sluice_tanks_lock_opened -= sluice_tanks_lock_params.step;
+        }
+        pthread_mutex_unlock(&sluice_tank_lock_mutex);
     }
 }

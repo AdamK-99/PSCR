@@ -190,19 +190,13 @@ void *userChangesThreadFunc(void *cookie)
                 pthread_mutex_unlock(&locks_set);
             }
         }
-        else if (c == 'u') //sluza; z gory, from up
+        else if (c == 's') //sluza; z gory, from up
         {
             pthread_mutex_lock(&mode_mutex);
             mode = 5;
             pthread_mutex_unlock(&mode_mutex);
         }
-        else if (c == 'd') //sluza; z dolu, from down
-        {
-            pthread_mutex_lock(&mode_mutex);
-            mode = 6;
-            pthread_mutex_unlock(&mode_mutex);
-        }
-        else if (c == 's') //zamkniecie drzwi sluzy
+        else if (c == 'd') //zamkniecie drzwi sluzy
         {
             pthread_mutex_lock(&sluice_door_mutex);
             if (sluice_door_opened == 1)

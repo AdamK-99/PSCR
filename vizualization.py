@@ -29,7 +29,7 @@ plt.ylim(ymin_input, ymax_input)
 plt.grid(visible=True)
 plt.suptitle('Calkowite natezenie wody przeplywajacej przez zbiornik')
 plt.xlabel('Czas [s]')
-plt.ylabel('Q [m3/s]')
+plt.ylabel('Q [l/s]')
 
 plt.figure(2) #output
 h2, = plt.plot([],[])
@@ -63,14 +63,16 @@ while True:
     if curr_time > xlim:
         plt.xlim(curr_time-xlim, curr_time)
     if unpacked_msg[0] > ymax_input:
-        plt.ylim(ymin_input, unpacked_msg[0])
+        plt.ylim(ymin_input, unpacked_msg[0]+10)
         ymax_input = unpacked_msg[0]
     elif unpacked_msg[0] < ymin_input:
-        plt.ylim(unpacked_msg[0], ymax_input)
+        plt.ylim(unpacked_msg[0]-10, ymax_input)
         ymin_input = unpacked_msg[0]
     plt.figure(1).canvas.draw()
     plt.figure(1).canvas.flush_events()
     plt.draw()
+
+    print(unpacked_msg[0])
 
     #output
     plt.figure(2)
