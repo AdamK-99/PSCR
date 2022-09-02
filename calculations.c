@@ -225,7 +225,6 @@ void alpha_controller(int alpha, int *alpha1, int *alpha2) //rozdzielacz katow
         *alpha2 = lock2_set;
         pthread_mutex_unlock(&locks_set);
     }
-    // else if ((mode_local == 5 || mode == 6) && sluice_step == 0)
     else if (mode_local == 5 && sluice_step_local == 0)
     {
         double water_lvl;
@@ -398,7 +397,7 @@ void sluice()
             pthread_mutex_unlock(&sluice_tank_lock_mutex);
             }
             
-            if(water_lvl - H_set_down > 2.6) //ochrona czesci calkujacej aby sie nie napelnila zbednie
+            if(water_lvl - H_set_down > 2.6) //napelnienie do 4,8m
             {
                 pthread_mutex_lock(&mode_mutex);
                 mode = 0;
@@ -431,7 +430,7 @@ void sluice()
         pthread_mutex_unlock(&sluice_door_mutex);
 
         pthread_mutex_lock(&sluice_tank_lock_mutex);
-        if(sluice_tanks_lock_opened > sluice_tanks_lock_params.step - 0.01)
+        if(sluice_tanks_lock_opened > sluice_tanks_lock_params.step - 0.01) //zamykanie zasuwy
         {
             sluice_tanks_lock_opened -= sluice_tanks_lock_params.step;
         }
