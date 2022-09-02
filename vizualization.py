@@ -101,7 +101,7 @@ while True:
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        print((int)hours,":",(int)minutes,":",(int)seconds," - Sluice door opened, waiting for signal to close...")
+        print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door opened, waiting for signal to close...")
         door_message_written = True
     
     if door_message_written and unpacked_msg[5] == 0:
@@ -109,5 +109,5 @@ while True:
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        print((int)hours,":",(int)minutes,":",(int)seconds," - Sluice door closed")
+        print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door closed")
         door_message_written = False
