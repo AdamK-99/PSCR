@@ -103,7 +103,7 @@ while True:
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        if hours != 0 and minutes != 0 and seconds != 0:
+        if  not(int(hours) == 0 and int(minutes) == 0 and int(seconds) == 0):
             print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door opened, waiting for signal to close...")
             door_message_written = True
     
@@ -112,7 +112,7 @@ while True:
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        if hours != 0 and minutes != 0 and seconds != 0:
+        if not (int(hours) == 0 and int(minutes) == 0 and int(seconds) == 0):
             print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door closed")
             door_message_written = False
 
@@ -121,7 +121,7 @@ while True:
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        if hours != 0 and minutes != 0 and seconds != 0:
+        if not (int(hours) == 0 and int(minutes) == 0 and int(seconds) == 0):
             print(int(hours),":",int(minutes),":",int(seconds)," - Auxiliary sluice tank can be used")
             auxiliary_tank_message_written = True
     

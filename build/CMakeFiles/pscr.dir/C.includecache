@@ -6,33 +6,17 @@
 
 #IncludeRegexTransform: 
 
-/home/student/Desktop/studia/pscr/calculations.h
-
-/home/student/Desktop/studia/pscr/logger.h
-
-/home/student/Desktop/studia/pscr/periodic.c
+/home/student/Desktop/studia/pscr/calculations.c
 stdio.h
 -
 stdlib.h
 -
 pthread.h
 -
-signal.h
--
-time.h
--
-errno.h
--
-mqueue.h
--
 unistd.h
 -
-periodic.h
-/home/student/Desktop/studia/pscr/periodic.h
 calculations.h
 /home/student/Desktop/studia/pscr/calculations.h
-logger.h
-/home/student/Desktop/studia/pscr/logger.h
 
-/home/student/Desktop/studia/pscr/periodic.h
+/home/student/Desktop/studia/pscr/calculations.h
 
