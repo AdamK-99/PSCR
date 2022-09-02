@@ -51,11 +51,13 @@ plt.xlabel("Czas [s]")
 plt.ylabel("Stopnie")
 
 door_message_written = False
+auxiliary_tank_message_written = False
+previous_auxiliary_tank_condition = 0
 
 print("Server set, starting to listen")
 while True:
     data, addr = sock.recvfrom(64)
-    unpacked_msg = struct.unpack('dddddd', data)
+    unpacked_msg = struct.unpack('ddddddd', data)
 
     # input
     plt.figure(1)
@@ -101,13 +103,29 @@ while True:
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door opened, waiting for signal to close...")
-        door_message_written = True
+        if hours != 0 and minutes != 0 and seconds != 0:
+            print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door opened, waiting for signal to close...")
+            door_message_written = True
     
     if door_message_written and unpacked_msg[5] == 0:
         minutes = unpacked_msg[4] // 60
         seconds = unpacked_msg[4] % 60
         hours = minutes // 60
         minutes = minutes % 60
-        print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door closed")
-        door_message_written = False
+        if hours != 0 and minutes != 0 and seconds != 0:
+            print(int(hours),":",int(minutes),":",int(seconds)," - Sluice door closed")
+            door_message_written = False
+
+    if(auxiliary_tank_message_written == False and unpacked_msg[6] == 0):
+        minutes = unpacked_msg[4] // 60
+        seconds = unpacked_msg[4] % 60
+        hours = minutes // 60
+        minutes = minutes % 60
+        if hours != 0 and minutes != 0 and seconds != 0:
+            print(int(hours),":",int(minutes),":",int(seconds)," - Auxiliary sluice tank can be used")
+            auxiliary_tank_message_written = True
+    
+    if(previous_auxiliary_tank_condition == 1 and unpacked_msg[6] == 0):
+        auxiliary_tank_message_written = False
+    
+    previous_auxiliary_tank_condition = unpacked_msg[6]

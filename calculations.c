@@ -24,7 +24,8 @@ double sluice_tanks_lock_opened = 0.0;
 int sluice_step = 0;
 int sluice_door_opened = 0;
 int sluice_signal_to_close_door = 0;
-int were_tanks_used = 0;
+int was_tank_used = 0;
+const double autiliary_tank_volume = 30*30*2.6*1000; //objetosc*1000l
 
 pthread_mutex_t input_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t output_plant_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -37,6 +38,7 @@ pthread_mutex_t sluice_step_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t sluice_door_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t sluice_signal_to_close_door_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t sluice_tank_lock_mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t auxiliary_tank_used_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 double PI(double, double*);
 void alpha_controller(int, int*, int*);
@@ -381,13 +383,21 @@ void sluice()
             sluice_door_opened = 0;
             pthread_mutex_unlock(&sluice_door_mutex);
 
-            pthread_mutex_lock(&sluice_tank_lock_mutex);
-            if(sluice_tanks_lock_opened < 1.0 - sluice_tanks_lock_params.step + 0.01 && were_tanks_used == 0)
-            {
-                sluice_tanks_lock_opened += sluice_tanks_lock_params.step;
-            }
-            pthread_mutex_unlock(&sluice_tank_lock_mutex);
+            int was_tank_used_local;
+            pthread_mutex_lock(&auxiliary_tank_used_mutex);
+            was_tank_used_local = was_tank_used;
+            pthread_mutex_unlock(&auxiliary_tank_used_mutex);
 
+            if(was_tank_used_local == 0)
+            {
+                pthread_mutex_lock(&sluice_tank_lock_mutex);
+                if(sluice_tanks_lock_opened < 1.0 - sluice_tanks_lock_params.step + 0.01 && was_tank_used == 0)
+                {
+                    sluice_tanks_lock_opened += sluice_tanks_lock_params.step;
+                }
+            pthread_mutex_unlock(&sluice_tank_lock_mutex);
+            }
+            
             if(water_lvl - H_set_down > 2.6) //ochrona czesci calkujacej aby sie nie napelnila zbednie
             {
                 pthread_mutex_lock(&mode_mutex);
@@ -397,7 +407,12 @@ void sluice()
                 pthread_mutex_lock(&sluice_signal_to_close_door_mutex);
                 sluice_signal_to_close_door = 0;
                 pthread_mutex_unlock(&sluice_signal_to_close_door_mutex);
-                were_tanks_used = 1;
+                pthread_mutex_lock(&auxiliary_tank_used_mutex);
+                if(was_tank_used == 0)
+                {
+                    was_tank_used = 1;
+                }
+                pthread_mutex_unlock(&auxiliary_tank_used_mutex);
             }
         }
     }
@@ -421,5 +436,27 @@ void sluice()
             sluice_tanks_lock_opened -= sluice_tanks_lock_params.step;
         }
         pthread_mutex_unlock(&sluice_tank_lock_mutex);
+    }
+}
+
+void auxiliaryTank()
+{
+    static double current_volume;
+    int was_tank_used_local;
+    pthread_mutex_lock(&auxiliary_tank_used_mutex);
+    was_tank_used_local = was_tank_used;
+    pthread_mutex_unlock(&auxiliary_tank_used_mutex);
+    if(was_tank_used_local == 1)
+    {
+        pthread_mutex_lock(&input_plant_mutex);
+        current_volume += river_flowrate;
+        pthread_mutex_unlock(&input_plant_mutex);
+        if(current_volume >= autiliary_tank_volume)
+        {
+            pthread_mutex_lock(&auxiliary_tank_used_mutex);
+            was_tank_used = 0;
+            pthread_mutex_unlock(&auxiliary_tank_used_mutex);
+            current_volume = 0.0; //mozna wyzerowac, to juz nieistotne, a po uzyciu i tak wyniesie 0
+        }
     }
 }

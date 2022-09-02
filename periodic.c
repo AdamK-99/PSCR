@@ -14,12 +14,13 @@
 void *tPeriodicThread(void *);
 void *plant(void *);
 void *control(void *);
-void *sluice_thread(void *);
+void *sluiceThread(void *);
+void *auxiliaryTankThread(void *);
 
 pthread_barrier_t barrier_plant, barrier_control;
 
 int fd;
-double buff[6];
+double buff[7];
 int counter = 3;
 
 int init_periodic()
@@ -64,8 +65,8 @@ int init_periodic()
 
 void *tPeriodicThread(void *cookie)
 {
-    pthread_t faster, slower, sluice;
-    pthread_attr_t afaster, aslower, asluice;
+    pthread_t faster, slower, sluice, tank;
+    pthread_attr_t afaster, aslower, asluice, atank;
     int policy;
     struct sched_param param;
 
@@ -89,8 +90,15 @@ void *tPeriodicThread(void *cookie)
     pthread_attr_init(&asluice);
     pthread_attr_setschedpolicy(&asluice, SCHED_FIFO);
     
-    pthread_create(&sluice, &asluice, sluice_thread, NULL);
+    pthread_create(&sluice, &asluice, sluiceThread, NULL);
     pthread_detach(sluice);
+
+    //zbiornik pomocniczy
+    pthread_attr_init(&atank);
+    pthread_attr_setschedpolicy(&atank, SCHED_FIFO);
+    
+    pthread_create(&tank, &atank, auxiliaryTankThread, NULL);
+    pthread_detach(tank);
 
     if(!counter_modulo) //co 4
     {
@@ -126,6 +134,9 @@ void *tPeriodicThread(void *cookie)
     pthread_mutex_lock(&sluice_door_mutex);
     buff[5] = (double)sluice_door_opened;
     pthread_mutex_unlock(&sluice_door_mutex);
+    pthread_mutex_lock(&auxiliary_tank_used_mutex);
+    buff[6] = (double)was_tank_used;
+    pthread_mutex_unlock(&auxiliary_tank_used_mutex);
 
     if ((fd = open("my_fifo", O_WRONLY)) == -1) {
             fprintf(stderr, "Cannot open FIFO.\n" ); 
@@ -136,7 +147,7 @@ void *tPeriodicThread(void *cookie)
     
     counter++;
     time_counter += 0.5;
-    for (int i = 0; i<6; i++)
+    for (int i = 0; i<7; i++)
     {
         buff[i] = 0.0;
     }
@@ -176,7 +187,7 @@ void *control(void *cookie)
     calculate_control();
 }
 
-void *sluice_thread(void *cookie)
+void *sluiceThread(void *cookie)
 {
     int policy;
     struct sched_param param;
@@ -187,4 +198,16 @@ void *sluice_thread(void *cookie)
 
     sluice_lock();
     sluice();
+}
+
+void *auxiliaryTankThread(void *cookie)
+{
+    int policy;
+    struct sched_param param;
+
+    pthread_getschedparam(pthread_self(), &policy, &param);
+    param.sched_priority = sched_get_priority_max(policy)-4;
+    pthread_setschedparam(pthread_self(), policy, &param);
+
+    auxiliaryTank();
 }

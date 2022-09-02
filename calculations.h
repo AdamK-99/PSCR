@@ -47,6 +47,7 @@ extern int mode;
 extern int lock1_set, lock2_set;
 extern int sluice_door_opened;
 extern int sluice_signal_to_close_door;
+extern int was_tank_used;
 extern pthread_mutex_t input_plant_mutex;
 extern pthread_mutex_t output_plant_mutex;
 extern pthread_mutex_t locks_angles; 
@@ -57,11 +58,13 @@ extern pthread_mutex_t sluice_lock_mutex;
 // extern pthread_mutex_t sluice_step_mutex;
 extern pthread_mutex_t sluice_door_mutex;
 extern pthread_mutex_t sluice_signal_to_close_door_mutex;
+extern pthread_mutex_t auxiliary_tank_used_mutex;
 
 void plant_step();
 void calculate_control();
 void calculate_input();
 void sluice_lock();
 void sluice();
+void auxiliaryTank();
 
 #endif
